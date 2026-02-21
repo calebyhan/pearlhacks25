@@ -1,0 +1,443 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 63;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		076D21D896F8340773936839 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_6D8D6648-18D7-42CA-A987-7C5E2B6AC940" /* ContentView.swift */; };
+		1165B24CA45C2F42B8724259 /* CryptoKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D77EE68542BF0D825117CD33 /* CryptoKit.framework */; };
+		19DCAC17892E15F41BD00090 /* SmartSpectraSwiftSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 52D88B10B7A7E30062959FA2 /* SmartSpectraSwiftSDK */; };
+		1A21FEA286FABDF02ED2D7E4 /* AudioTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_949FEFD0-88D7-407E-9832-5A0C6078A952" /* AudioTap.swift */; };
+		224D9AD6A869733384DFCB87 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_1BD88A44-594B-424B-BDF4-6EB6145F52EE" /* Config.swift */; };
+		512398B666599AF65BFA1DF7 /* Visual911App.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_00501BCA-51DA-46DD-B9A8-9371B7199B7D" /* Visual911App.swift */; };
+		7B831C334AB49A4F8D30D21F /* VitalsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_61A3958E-6233-4BAE-82A3-E2F1159EC6ED" /* VitalsClient.swift */; };
+		833C86F42D7846B8825D185B /* PresageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_1D47584C-9FE3-4683-866F-BD74949E83BD" /* PresageManager.swift */; };
+		83F734EE84DB53B9B207B82E /* CoreLocation.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BE53BC75132291932543027A /* CoreLocation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A7418FFAB74AE1AA5B06346B /* ScanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B366630D4640B88F6E132A /* ScanningView.swift */; };
+		BFB85C6BC15CF31965B70B0F /* CallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_36D15868-EEF5-4568-B013-C26678BD5428" /* CallManager.swift */; };
+		C861ADD9F12F0EC629E7D3A4 /* IdleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E9A66716FB05EB0F78CE63 /* IdleView.swift */; };
+		C8E19AFBC41322FE1E03227B /* TURNCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_D2D8D596-220E-4139-BF6A-57AD82684D2B" /* TURNCredentials.swift */; };
+		CB5F6E222855E0B66D13FAF4 /* AVFoundation.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 29357435F1595C31808BB98D /* AVFoundation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DDCAECF4ECAD7CD29E2A50F3 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 398379ABCA73A4A7486D5DEE /* WebRTC */; };
+		E23CE5342CE8CAF08922D385 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29357435F1595C31808BB98D /* AVFoundation.framework */; };
+		E57FB01E86FF00F17ED7E047 /* SignalingClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_5B91F345-9756-4715-81D6-3C20AFCCD11B" /* SignalingClient.swift */; };
+		F274FC3CC222B535550C460E /* ActiveCallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B22ECEBE45369867144032F /* ActiveCallView.swift */; };
+		F955DBCADF8918E184E94E51 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE53BC75132291932543027A /* CoreLocation.framework */; };
+		FE0AEF8DA9B54D83BC5D2443 /* WebRTCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_1A5A91DA-C5D8-4D48-802C-CF3D41A24101" /* WebRTCManager.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AD9B41B2B51E990EA5231B00 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CB5F6E222855E0B66D13FAF4 /* AVFoundation.framework in Embed Frameworks */,
+				83F734EE84DB53B9B207B82E /* CoreLocation.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		02AFEC396851060C54EC59E3 /* Visual911.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Visual911.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		29357435F1595C31808BB98D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AVFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		37B366630D4640B88F6E132A /* ScanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanningView.swift; sourceTree = "<group>"; };
+		4B22ECEBE45369867144032F /* ActiveCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveCallView.swift; sourceTree = "<group>"; };
+		91E9A66716FB05EB0F78CE63 /* IdleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleView.swift; sourceTree = "<group>"; };
+		BE53BC75132291932543027A /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CoreLocation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D77EE68542BF0D825117CD33 /* CryptoKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CryptoKit.framework; path = System/Library/Frameworks/CryptoKit.framework; sourceTree = SDKROOT; };
+		"TEMP_00501BCA-51DA-46DD-B9A8-9371B7199B7D" /* Visual911App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Visual911App.swift; sourceTree = "<group>"; };
+		"TEMP_1A5A91DA-C5D8-4D48-802C-CF3D41A24101" /* WebRTCManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRTCManager.swift; sourceTree = "<group>"; };
+		"TEMP_1BD88A44-594B-424B-BDF4-6EB6145F52EE" /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		"TEMP_1D47584C-9FE3-4683-866F-BD74949E83BD" /* PresageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresageManager.swift; sourceTree = "<group>"; };
+		"TEMP_36D15868-EEF5-4568-B013-C26678BD5428" /* CallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallManager.swift; sourceTree = "<group>"; };
+		"TEMP_5B91F345-9756-4715-81D6-3C20AFCCD11B" /* SignalingClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalingClient.swift; sourceTree = "<group>"; };
+		"TEMP_61A3958E-6233-4BAE-82A3-E2F1159EC6ED" /* VitalsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VitalsClient.swift; sourceTree = "<group>"; };
+		"TEMP_6D8D6648-18D7-42CA-A987-7C5E2B6AC940" /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		"TEMP_949FEFD0-88D7-407E-9832-5A0C6078A952" /* AudioTap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTap.swift; sourceTree = "<group>"; };
+		"TEMP_D2D8D596-220E-4139-BF6A-57AD82684D2B" /* TURNCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TURNCredentials.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7AE3427E9D0CAE411753A454 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				19DCAC17892E15F41BD00090 /* SmartSpectraSwiftSDK in Frameworks */,
+				DDCAECF4ECAD7CD29E2A50F3 /* WebRTC in Frameworks */,
+				E23CE5342CE8CAF08922D385 /* AVFoundation.framework in Frameworks */,
+				F955DBCADF8918E184E94E51 /* CoreLocation.framework in Frameworks */,
+				1165B24CA45C2F42B8724259 /* CryptoKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		108B700DB484DF9EEDEABF52 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				02AFEC396851060C54EC59E3 /* Visual911.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5AA863582F4A56AF0019EAED /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				"TEMP_949FEFD0-88D7-407E-9832-5A0C6078A952" /* AudioTap.swift */,
+				"TEMP_36D15868-EEF5-4568-B013-C26678BD5428" /* CallManager.swift */,
+				"TEMP_1BD88A44-594B-424B-BDF4-6EB6145F52EE" /* Config.swift */,
+				"TEMP_6D8D6648-18D7-42CA-A987-7C5E2B6AC940" /* ContentView.swift */,
+				"TEMP_1D47584C-9FE3-4683-866F-BD74949E83BD" /* PresageManager.swift */,
+				"TEMP_5B91F345-9756-4715-81D6-3C20AFCCD11B" /* SignalingClient.swift */,
+				"TEMP_D2D8D596-220E-4139-BF6A-57AD82684D2B" /* TURNCredentials.swift */,
+				"TEMP_00501BCA-51DA-46DD-B9A8-9371B7199B7D" /* Visual911App.swift */,
+				"TEMP_61A3958E-6233-4BAE-82A3-E2F1159EC6ED" /* VitalsClient.swift */,
+				"TEMP_1A5A91DA-C5D8-4D48-802C-CF3D41A24101" /* WebRTCManager.swift */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		8CC41C66BA0BDDE6416DBFC2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				29357435F1595C31808BB98D /* AVFoundation.framework */,
+				BE53BC75132291932543027A /* CoreLocation.framework */,
+				D77EE68542BF0D825117CD33 /* CryptoKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		97B1065B431B647A206E60F7 = {
+			isa = PBXGroup;
+			children = (
+				A85E9578C264EFF0F8708FF7 /* Views */,
+				8CC41C66BA0BDDE6416DBFC2 /* Frameworks */,
+				108B700DB484DF9EEDEABF52 /* Products */,
+				5AA863582F4A56AF0019EAED /* Recovered References */,
+			);
+			sourceTree = "<group>";
+		};
+		A85E9578C264EFF0F8708FF7 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4B22ECEBE45369867144032F /* ActiveCallView.swift */,
+				91E9A66716FB05EB0F78CE63 /* IdleView.swift */,
+				37B366630D4640B88F6E132A /* ScanningView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DF68590793C8F7F5F3E46873 /* Visual911 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C5B131108915E9210F16A41F /* Build configuration list for PBXNativeTarget "Visual911" */;
+			buildPhases = (
+				91D7A6B667B46A0AB1E2C3A8 /* Sources */,
+				7AE3427E9D0CAE411753A454 /* Frameworks */,
+				AD9B41B2B51E990EA5231B00 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Visual911;
+			packageProductDependencies = (
+				52D88B10B7A7E30062959FA2 /* SmartSpectraSwiftSDK */,
+				398379ABCA73A4A7486D5DEE /* WebRTC */,
+			);
+			productName = Visual911;
+			productReference = 02AFEC396851060C54EC59E3 /* Visual911.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		10CAFEEB7182C2C10C08CE94 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					DF68590793C8F7F5F3E46873 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 2EAEBD147BD5C1758F8020CA /* Build configuration list for PBXProject "Visual911" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 97B1065B431B647A206E60F7;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				06C3F713FE92AD1F69A600FF /* XCRemoteSwiftPackageReference "SmartSpectra" */,
+				F4C080976E19EB3A35A0102C /* XCRemoteSwiftPackageReference "WebRTC" */,
+			);
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DF68590793C8F7F5F3E46873 /* Visual911 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		91D7A6B667B46A0AB1E2C3A8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F274FC3CC222B535550C460E /* ActiveCallView.swift in Sources */,
+				1A21FEA286FABDF02ED2D7E4 /* AudioTap.swift in Sources */,
+				BFB85C6BC15CF31965B70B0F /* CallManager.swift in Sources */,
+				224D9AD6A869733384DFCB87 /* Config.swift in Sources */,
+				076D21D896F8340773936839 /* ContentView.swift in Sources */,
+				C861ADD9F12F0EC629E7D3A4 /* IdleView.swift in Sources */,
+				833C86F42D7846B8825D185B /* PresageManager.swift in Sources */,
+				A7418FFAB74AE1AA5B06346B /* ScanningView.swift in Sources */,
+				E57FB01E86FF00F17ED7E047 /* SignalingClient.swift in Sources */,
+				C8E19AFBC41322FE1E03227B /* TURNCredentials.swift in Sources */,
+				512398B666599AF65BFA1DF7 /* Visual911App.swift in Sources */,
+				7B831C334AB49A4F8D30D21F /* VitalsClient.swift in Sources */,
+				FE0AEF8DA9B54D83BC5D2443 /* WebRTCManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		040A596373552F47A07B3E60 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MBD2T58JVW;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.visual911.app;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		5DB1A6416764B0C7920887C2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		7E62FC5C144ECB4D2F3FE85F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MBD2T58JVW;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.visual911.app;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		D6D785735E1836824FC76880 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2EAEBD147BD5C1758F8020CA /* Build configuration list for PBXProject "Visual911" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D6D785735E1836824FC76880 /* Debug */,
+				5DB1A6416764B0C7920887C2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C5B131108915E9210F16A41F /* Build configuration list for PBXNativeTarget "Visual911" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				040A596373552F47A07B3E60 /* Debug */,
+				7E62FC5C144ECB4D2F3FE85F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		06C3F713FE92AD1F69A600FF /* XCRemoteSwiftPackageReference "SmartSpectra" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Presage-Security/SmartSpectra";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		F4C080976E19EB3A35A0102C /* XCRemoteSwiftPackageReference "WebRTC" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stasel/WebRTC";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 125.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		398379ABCA73A4A7486D5DEE /* WebRTC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4C080976E19EB3A35A0102C /* XCRemoteSwiftPackageReference "WebRTC" */;
+			productName = WebRTC;
+		};
+		52D88B10B7A7E30062959FA2 /* SmartSpectraSwiftSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 06C3F713FE92AD1F69A600FF /* XCRemoteSwiftPackageReference "SmartSpectra" */;
+			productName = SmartSpectraSwiftSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 10CAFEEB7182C2C10C08CE94 /* Project object */;
+}

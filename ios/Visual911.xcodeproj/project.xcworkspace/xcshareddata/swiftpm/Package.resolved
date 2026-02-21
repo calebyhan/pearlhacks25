@@ -1,0 +1,33 @@
+{
+  "originHash" : "e3c6530d3b1ff7876eddca3f7c4872811a21db55219b8dde99ad7c33c057d86a",
+  "pins" : [
+    {
+      "identity" : "smartspectra",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Presage-Security/SmartSpectra",
+      "state" : {
+        "revision" : "bce474c4c387d67735a395cda020905b6e96809d",
+        "version" : "1.7.0"
+      }
+    },
+    {
+      "identity" : "swift-protobuf",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-protobuf.git",
+      "state" : {
+        "revision" : "9bbb079b69af9d66470ced85461bf13bb40becac",
+        "version" : "1.35.0"
+      }
+    },
+    {
+      "identity" : "webrtc",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/stasel/WebRTC",
+      "state" : {
+        "revision" : "b4f5a90c887bde68512b8f1a6d684b27b5597b76",
+        "version" : "125.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}
