@@ -5,8 +5,7 @@ func generateTURNCredentials(secret: String) -> (username: String, credential: S
     let expiry = Int(Date().timeIntervalSince1970) + 3600  // 1 hour
     let username = "\(expiry):visual911user"
     let key = SymmetricKey(data: Data(secret.utf8))
-    // SHA1 lives under CryptoKit.Insecure — HMAC<SHA1> does not compile
-    let mac = Insecure.HMAC<Insecure.SHA1>.authenticationCode(for: Data(username.utf8), using: key)
+    let mac = HMAC<Insecure.SHA1>.authenticationCode(for: Data(username.utf8), using: key)
     let credential = Data(mac).base64EncodedString()
     return (username, credential)
 }

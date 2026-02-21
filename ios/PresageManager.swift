@@ -1,5 +1,6 @@
 import SmartSpectraSwiftSDK
 import Combine
+import Foundation
 
 struct VitalsReading {
     let hr: Double
@@ -11,17 +12,22 @@ struct VitalsReading {
 
 class PresageManager: ObservableObject {
     @Published var latestReading: VitalsReading?
-    private var sdk = SmartSpectraSwiftSDK.shared
+    private let sdk = SmartSpectraSwiftSDK.shared
+    private let processor = SmartSpectraVitalsProcessor.shared
     private var cancellables = Set<AnyCancellable>()
 
     init() {
         sdk.setApiKey(Config.presageApiKey)
+        sdk.setSmartSpectraMode(.continuous)
+        sdk.setCameraPosition(.front)
+        sdk.setImageOutputEnabled(false) // headless — no preview needed
     }
 
     func startMeasuring() {
-        sdk.startMeasuring()
+        processor.startProcessing()
+        processor.startRecording()
 
-        // Observe MetricsBuffer updates
+        // Observe MetricsBuffer updates from the SDK singleton
         sdk.$metricsBuffer
             .compactMap { $0 }
             .sink { [weak self] buffer in
@@ -31,10 +37,10 @@ class PresageManager: ObservableObject {
                 else { return }
 
                 let reading = VitalsReading(
-                    hr: hrVal.value,
-                    hrConfidence: hrVal.confidence,
-                    breathing: breathVal.value,
-                    breathingConfidence: breathVal.confidence,
+                    hr: Double(hrVal.value),
+                    hrConfidence: Double(hrVal.confidence),
+                    breathing: Double(breathVal.value),
+                    breathingConfidence: Double(breathVal.confidence),
                     timestamp: Date()
                 )
                 DispatchQueue.main.async {
@@ -45,6 +51,8 @@ class PresageManager: ObservableObject {
     }
 
     func stopMeasuring() {
-        sdk.stopMeasuring()
+        processor.stopRecording()
+        processor.stopProcessing()
+        cancellables.removeAll()
     }
 }

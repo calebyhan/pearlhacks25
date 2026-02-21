@@ -58,20 +58,51 @@ class WebRTCManager: NSObject {
         localVideoTrack = WebRTCManager.factory.videoTrack(with: videoSource, trackId: "video0")
         peerConnection.add(localVideoTrack!, streamIds: ["stream0"])
 
-        // Start front camera capture
         capturer = RTCCameraVideoCapturer(delegate: videoSource)
-        guard let frontCamera = RTCCameraVideoCapturer.captureDevices().first(where: { $0.position == .front }),
-              let format = RTCCameraVideoCapturer.supportedFormats(for: frontCamera)
-                .sorted(by: { CMVideoFormatDescriptionGetDimensions($0.formatDescription).width <
-                              CMVideoFormatDescriptionGetDimensions($1.formatDescription).width })
-                .last,
-              let fps = format.videoSupportedFrameRateRanges.max(by: { $0.maxFrameRate < $1.maxFrameRate })
-        else { return }
-
-        capturer?.startCapture(with: frontCamera, format: format, fps: Int(fps.maxFrameRate))
+        startCameraCapture(retryCount: 0)
     }
 
-    func createOffer(completion: @escaping ([String: Any]) -> Void) {
+    private func startCameraCapture(retryCount: Int) {
+        guard let frontCamera = RTCCameraVideoCapturer.captureDevices().first(where: { $0.position == .front }) else {
+            print("[WebRTC] ERROR: No front camera found")
+            return
+        }
+        // Pick a format close to 1280x720 — full 4032x3024 overwhelms the WebRTC encoder
+        let formats = RTCCameraVideoCapturer.supportedFormats(for: frontCamera)
+        guard let format = formats.min(by: {
+            let d0 = CMVideoFormatDescriptionGetDimensions($0.formatDescription)
+            let d1 = CMVideoFormatDescriptionGetDimensions($1.formatDescription)
+            return abs(Int(d0.width) - 1280) < abs(Int(d1.width) - 1280)
+        }) else {
+            print("[WebRTC] ERROR: No supported camera format")
+            return
+        }
+        guard let fps = format.videoSupportedFrameRateRanges.max(by: { $0.maxFrameRate < $1.maxFrameRate }) else {
+            print("[WebRTC] ERROR: No FPS range")
+            return
+        }
+
+        let dims = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
+        print("[WebRTC] Starting camera: \(dims.width)x\(dims.height) @ \(Int(fps.maxFrameRate))fps (attempt \(retryCount + 1))")
+
+        capturer?.startCapture(with: frontCamera, format: format, fps: Int(fps.maxFrameRate)) { [weak self] error in
+            if let error {
+                print("[WebRTC] Camera start FAILED: \(error)")
+                if retryCount < 3 {
+                    print("[WebRTC] Retrying camera start in 1s...")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        self?.startCameraCapture(retryCount: retryCount + 1)
+                    }
+                } else {
+                    print("[WebRTC] Camera failed after \(retryCount + 1) attempts")
+                }
+            } else {
+                print("[WebRTC] Camera started successfully")
+            }
+        }
+    }
+
+    func createOffer(callId: String, completion: @escaping ([String: Any]) -> Void) {
         let constraints = RTCMediaConstraints(
             mandatoryConstraints: [
                 kRTCMediaConstraintsOfferToReceiveAudio: kRTCMediaConstraintsValueTrue,
@@ -82,7 +113,7 @@ class WebRTCManager: NSObject {
         peerConnection.offer(for: constraints) { [weak self] sdp, error in
             guard let sdp else { return }
             self?.peerConnection.setLocalDescription(sdp) { _ in
-                completion(["type": "offer", "sdp": sdp.sdp])
+                completion(["type": "offer", "call_id": callId, "sdp": sdp.sdp])
             }
         }
     }

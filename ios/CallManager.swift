@@ -1,6 +1,7 @@
 import SwiftUI
 import Combine
 import CoreLocation
+import WebRTC
 
 enum CallState {
     case idle
@@ -52,7 +53,11 @@ class CallManager: ObservableObject {
     }
 
     private func initiateCall() {
-        guard let callId else { return }
+        guard let callId else {
+            print("[CallManager] initiateCall: callId is nil, aborting")
+            return
+        }
+        print("[CallManager] initiateCall: starting with callId=\(callId)")
         let location = currentLocation()
         let locationDict: [String: Any] = location.map {
             ["lat": $0.latitude, "lng": $0.longitude]
@@ -64,13 +69,19 @@ class CallManager: ObservableObject {
         vitalsClient = VitalsClient(callId: callId)
         audioTap = AudioTap(callId: callId)
 
+        print("[CallManager] connecting signaling...")
         signalingClient?.connect()
+        print("[CallManager] connecting vitals...")
         vitalsClient?.connect()
+        print("[CallManager] starting audio tap...")
         audioTap?.start()
 
         // Send cached vitals from the Presage scan immediately
         if let vitals = lastVitals {
+            print("[CallManager] sending cached vitals: HR=\(vitals.hr) BR=\(vitals.breathing)")
             vitalsClient?.send(reading: vitals)
+        } else {
+            print("[CallManager] no vitals from Presage scan (too dark or no confident reading)")
         }
 
         signalingClient?.send([
@@ -84,7 +95,7 @@ class CallManager: ObservableObject {
         transition(to: .connecting)
         let webrtc = WebRTCManager(delegate: self)
         self.webrtc = webrtc
-        webrtc.createOffer { [weak self] sdp in
+        webrtc.createOffer(callId: callId ?? "") { [weak self] sdp in
             self?.signalingClient?.send(sdp)
         }
     }
@@ -147,13 +158,19 @@ extension CallManager: WebRTCManagerDelegate {
     }
 
     func webRTCManager(_ manager: WebRTCManager, didChangeConnectionState state: RTCIceConnectionState) {
-        switch state {
-        case .connected, .completed:
-            transition(to: .active)
-        case .failed, .disconnected:
-            endCall(reason: "connection_failed")
-        default:
-            break
+        print("[WebRTC] ICE state: \(state.rawValue)")
+        DispatchQueue.main.async { [weak self] in
+            switch state {
+            case .connected, .completed:
+                self?.transition(to: .active)
+            case .failed:
+                self?.endCall(reason: "connection_failed")
+            case .disconnected:
+                // Transient state — ICE may recover. Don't tear down.
+                print("[WebRTC] ICE disconnected (transient, not ending call)")
+            default:
+                break
+            }
         }
     }
 

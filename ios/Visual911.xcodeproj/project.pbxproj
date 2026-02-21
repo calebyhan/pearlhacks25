@@ -7,61 +7,38 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		076D21D896F8340773936839 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_6D8D6648-18D7-42CA-A987-7C5E2B6AC940" /* ContentView.swift */; };
-		1165B24CA45C2F42B8724259 /* CryptoKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D77EE68542BF0D825117CD33 /* CryptoKit.framework */; };
+		131FD15ED775E73314F3E6A8 /* SignalingClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_832F670A-C68A-4816-A343-CAB4E4E747CF" /* SignalingClient.swift */; };
 		19DCAC17892E15F41BD00090 /* SmartSpectraSwiftSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 52D88B10B7A7E30062959FA2 /* SmartSpectraSwiftSDK */; };
-		1A21FEA286FABDF02ED2D7E4 /* AudioTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_949FEFD0-88D7-407E-9832-5A0C6078A952" /* AudioTap.swift */; };
-		224D9AD6A869733384DFCB87 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_1BD88A44-594B-424B-BDF4-6EB6145F52EE" /* Config.swift */; };
-		512398B666599AF65BFA1DF7 /* Visual911App.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_00501BCA-51DA-46DD-B9A8-9371B7199B7D" /* Visual911App.swift */; };
-		7B831C334AB49A4F8D30D21F /* VitalsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_61A3958E-6233-4BAE-82A3-E2F1159EC6ED" /* VitalsClient.swift */; };
-		833C86F42D7846B8825D185B /* PresageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_1D47584C-9FE3-4683-866F-BD74949E83BD" /* PresageManager.swift */; };
-		83F734EE84DB53B9B207B82E /* CoreLocation.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BE53BC75132291932543027A /* CoreLocation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		27580F30EF8AD9D3346CBCB8 /* AudioTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_8DAE9A13-4D29-481C-90F0-969C525BD972" /* AudioTap.swift */; };
+		58FDFC9C9B71D20DA7D32983 /* Visual911App.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_C052B6E9-A4ED-4A9E-9563-B62CBE05E525" /* Visual911App.swift */; };
+		635B432EA7F331995A4F2B5D /* TURNCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_943FA7E8-2F3E-4777-8F64-51FA2F5417B4" /* TURNCredentials.swift */; };
+		7176C3A4574567FB84F8E017 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_78D8DA44-70BB-4F87-9814-46D39600C3EF" /* ContentView.swift */; };
+		894BE5AF0C827FEEC44CC8A9 /* PresageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_A1B2DEAF-3A10-47B0-BFE5-5FC8F90945FA" /* PresageManager.swift */; };
+		9F49FD3CCB6867C45EFC434D /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_9AD25E12-4E51-494F-8656-CA7384142D36" /* Config.swift */; };
 		A7418FFAB74AE1AA5B06346B /* ScanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B366630D4640B88F6E132A /* ScanningView.swift */; };
-		BFB85C6BC15CF31965B70B0F /* CallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_36D15868-EEF5-4568-B013-C26678BD5428" /* CallManager.swift */; };
 		C861ADD9F12F0EC629E7D3A4 /* IdleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E9A66716FB05EB0F78CE63 /* IdleView.swift */; };
-		C8E19AFBC41322FE1E03227B /* TURNCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_D2D8D596-220E-4139-BF6A-57AD82684D2B" /* TURNCredentials.swift */; };
-		CB5F6E222855E0B66D13FAF4 /* AVFoundation.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 29357435F1595C31808BB98D /* AVFoundation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D908BA8EC36FBD68FDABD115 /* WebRTCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_3D7FADBC-E462-43D7-928D-263948280CD7" /* WebRTCManager.swift */; };
 		DDCAECF4ECAD7CD29E2A50F3 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 398379ABCA73A4A7486D5DEE /* WebRTC */; };
-		E23CE5342CE8CAF08922D385 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29357435F1595C31808BB98D /* AVFoundation.framework */; };
-		E57FB01E86FF00F17ED7E047 /* SignalingClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_5B91F345-9756-4715-81D6-3C20AFCCD11B" /* SignalingClient.swift */; };
+		E9468A34BB631D6C05917A54 /* CallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_C288FAF5-99DF-4F18-807E-0AA912938D94" /* CallManager.swift */; };
+		F1D82A176AACE8F03D066FE7 /* VitalsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_C9F0678C-133A-4C70-8933-A262D156CA03" /* VitalsClient.swift */; };
 		F274FC3CC222B535550C460E /* ActiveCallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B22ECEBE45369867144032F /* ActiveCallView.swift */; };
-		F955DBCADF8918E184E94E51 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE53BC75132291932543027A /* CoreLocation.framework */; };
-		FE0AEF8DA9B54D83BC5D2443 /* WebRTCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_1A5A91DA-C5D8-4D48-802C-CF3D41A24101" /* WebRTCManager.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		AD9B41B2B51E990EA5231B00 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				CB5F6E222855E0B66D13FAF4 /* AVFoundation.framework in Embed Frameworks */,
-				83F734EE84DB53B9B207B82E /* CoreLocation.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		02AFEC396851060C54EC59E3 /* Visual911.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Visual911.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		29357435F1595C31808BB98D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AVFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		37B366630D4640B88F6E132A /* ScanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanningView.swift; sourceTree = "<group>"; };
 		4B22ECEBE45369867144032F /* ActiveCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveCallView.swift; sourceTree = "<group>"; };
 		91E9A66716FB05EB0F78CE63 /* IdleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleView.swift; sourceTree = "<group>"; };
-		BE53BC75132291932543027A /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CoreLocation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D77EE68542BF0D825117CD33 /* CryptoKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CryptoKit.framework; path = System/Library/Frameworks/CryptoKit.framework; sourceTree = SDKROOT; };
-		"TEMP_00501BCA-51DA-46DD-B9A8-9371B7199B7D" /* Visual911App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Visual911App.swift; sourceTree = "<group>"; };
-		"TEMP_1A5A91DA-C5D8-4D48-802C-CF3D41A24101" /* WebRTCManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRTCManager.swift; sourceTree = "<group>"; };
-		"TEMP_1BD88A44-594B-424B-BDF4-6EB6145F52EE" /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
-		"TEMP_1D47584C-9FE3-4683-866F-BD74949E83BD" /* PresageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresageManager.swift; sourceTree = "<group>"; };
-		"TEMP_36D15868-EEF5-4568-B013-C26678BD5428" /* CallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallManager.swift; sourceTree = "<group>"; };
-		"TEMP_5B91F345-9756-4715-81D6-3C20AFCCD11B" /* SignalingClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalingClient.swift; sourceTree = "<group>"; };
-		"TEMP_61A3958E-6233-4BAE-82A3-E2F1159EC6ED" /* VitalsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VitalsClient.swift; sourceTree = "<group>"; };
-		"TEMP_6D8D6648-18D7-42CA-A987-7C5E2B6AC940" /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		"TEMP_949FEFD0-88D7-407E-9832-5A0C6078A952" /* AudioTap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTap.swift; sourceTree = "<group>"; };
-		"TEMP_D2D8D596-220E-4139-BF6A-57AD82684D2B" /* TURNCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TURNCredentials.swift; sourceTree = "<group>"; };
+		"TEMP_3D7FADBC-E462-43D7-928D-263948280CD7" /* WebRTCManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRTCManager.swift; sourceTree = "<group>"; };
+		"TEMP_78D8DA44-70BB-4F87-9814-46D39600C3EF" /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		"TEMP_832F670A-C68A-4816-A343-CAB4E4E747CF" /* SignalingClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalingClient.swift; sourceTree = "<group>"; };
+		"TEMP_8DAE9A13-4D29-481C-90F0-969C525BD972" /* AudioTap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTap.swift; sourceTree = "<group>"; };
+		"TEMP_943FA7E8-2F3E-4777-8F64-51FA2F5417B4" /* TURNCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TURNCredentials.swift; sourceTree = "<group>"; };
+		"TEMP_9AD25E12-4E51-494F-8656-CA7384142D36" /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		"TEMP_A1B2DEAF-3A10-47B0-BFE5-5FC8F90945FA" /* PresageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresageManager.swift; sourceTree = "<group>"; };
+		"TEMP_C052B6E9-A4ED-4A9E-9563-B62CBE05E525" /* Visual911App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Visual911App.swift; sourceTree = "<group>"; };
+		"TEMP_C288FAF5-99DF-4F18-807E-0AA912938D94" /* CallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallManager.swift; sourceTree = "<group>"; };
+		"TEMP_C9F0678C-133A-4C70-8933-A262D156CA03" /* VitalsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VitalsClient.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,9 +48,6 @@
 			files = (
 				19DCAC17892E15F41BD00090 /* SmartSpectraSwiftSDK in Frameworks */,
 				DDCAECF4ECAD7CD29E2A50F3 /* WebRTC in Frameworks */,
-				E23CE5342CE8CAF08922D385 /* AVFoundation.framework in Frameworks */,
-				F955DBCADF8918E184E94E51 /* CoreLocation.framework in Frameworks */,
-				1165B24CA45C2F42B8724259 /* CryptoKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,40 +62,29 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		5AA863582F4A56AF0019EAED /* Recovered References */ = {
+		5A9337C12F4A6A11008AAF38 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
-				"TEMP_949FEFD0-88D7-407E-9832-5A0C6078A952" /* AudioTap.swift */,
-				"TEMP_36D15868-EEF5-4568-B013-C26678BD5428" /* CallManager.swift */,
-				"TEMP_1BD88A44-594B-424B-BDF4-6EB6145F52EE" /* Config.swift */,
-				"TEMP_6D8D6648-18D7-42CA-A987-7C5E2B6AC940" /* ContentView.swift */,
-				"TEMP_1D47584C-9FE3-4683-866F-BD74949E83BD" /* PresageManager.swift */,
-				"TEMP_5B91F345-9756-4715-81D6-3C20AFCCD11B" /* SignalingClient.swift */,
-				"TEMP_D2D8D596-220E-4139-BF6A-57AD82684D2B" /* TURNCredentials.swift */,
-				"TEMP_00501BCA-51DA-46DD-B9A8-9371B7199B7D" /* Visual911App.swift */,
-				"TEMP_61A3958E-6233-4BAE-82A3-E2F1159EC6ED" /* VitalsClient.swift */,
-				"TEMP_1A5A91DA-C5D8-4D48-802C-CF3D41A24101" /* WebRTCManager.swift */,
+				"TEMP_8DAE9A13-4D29-481C-90F0-969C525BD972" /* AudioTap.swift */,
+				"TEMP_C288FAF5-99DF-4F18-807E-0AA912938D94" /* CallManager.swift */,
+				"TEMP_9AD25E12-4E51-494F-8656-CA7384142D36" /* Config.swift */,
+				"TEMP_78D8DA44-70BB-4F87-9814-46D39600C3EF" /* ContentView.swift */,
+				"TEMP_A1B2DEAF-3A10-47B0-BFE5-5FC8F90945FA" /* PresageManager.swift */,
+				"TEMP_832F670A-C68A-4816-A343-CAB4E4E747CF" /* SignalingClient.swift */,
+				"TEMP_943FA7E8-2F3E-4777-8F64-51FA2F5417B4" /* TURNCredentials.swift */,
+				"TEMP_C052B6E9-A4ED-4A9E-9563-B62CBE05E525" /* Visual911App.swift */,
+				"TEMP_C9F0678C-133A-4C70-8933-A262D156CA03" /* VitalsClient.swift */,
+				"TEMP_3D7FADBC-E462-43D7-928D-263948280CD7" /* WebRTCManager.swift */,
 			);
 			name = "Recovered References";
-			sourceTree = "<group>";
-		};
-		8CC41C66BA0BDDE6416DBFC2 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				29357435F1595C31808BB98D /* AVFoundation.framework */,
-				BE53BC75132291932543027A /* CoreLocation.framework */,
-				D77EE68542BF0D825117CD33 /* CryptoKit.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		97B1065B431B647A206E60F7 = {
 			isa = PBXGroup;
 			children = (
 				A85E9578C264EFF0F8708FF7 /* Views */,
-				8CC41C66BA0BDDE6416DBFC2 /* Frameworks */,
 				108B700DB484DF9EEDEABF52 /* Products */,
-				5AA863582F4A56AF0019EAED /* Recovered References */,
+				5A9337C12F4A6A11008AAF38 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -144,7 +107,6 @@
 			buildPhases = (
 				91D7A6B667B46A0AB1E2C3A8 /* Sources */,
 				7AE3427E9D0CAE411753A454 /* Frameworks */,
-				AD9B41B2B51E990EA5231B00 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -201,18 +163,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				F274FC3CC222B535550C460E /* ActiveCallView.swift in Sources */,
-				1A21FEA286FABDF02ED2D7E4 /* AudioTap.swift in Sources */,
-				BFB85C6BC15CF31965B70B0F /* CallManager.swift in Sources */,
-				224D9AD6A869733384DFCB87 /* Config.swift in Sources */,
-				076D21D896F8340773936839 /* ContentView.swift in Sources */,
+				27580F30EF8AD9D3346CBCB8 /* AudioTap.swift in Sources */,
+				E9468A34BB631D6C05917A54 /* CallManager.swift in Sources */,
+				9F49FD3CCB6867C45EFC434D /* Config.swift in Sources */,
+				7176C3A4574567FB84F8E017 /* ContentView.swift in Sources */,
 				C861ADD9F12F0EC629E7D3A4 /* IdleView.swift in Sources */,
-				833C86F42D7846B8825D185B /* PresageManager.swift in Sources */,
+				894BE5AF0C827FEEC44CC8A9 /* PresageManager.swift in Sources */,
 				A7418FFAB74AE1AA5B06346B /* ScanningView.swift in Sources */,
-				E57FB01E86FF00F17ED7E047 /* SignalingClient.swift in Sources */,
-				C8E19AFBC41322FE1E03227B /* TURNCredentials.swift in Sources */,
-				512398B666599AF65BFA1DF7 /* Visual911App.swift in Sources */,
-				7B831C334AB49A4F8D30D21F /* VitalsClient.swift in Sources */,
-				FE0AEF8DA9B54D83BC5D2443 /* WebRTCManager.swift in Sources */,
+				131FD15ED775E73314F3E6A8 /* SignalingClient.swift in Sources */,
+				635B432EA7F331995A4F2B5D /* TURNCredentials.swift in Sources */,
+				58FDFC9C9B71D20DA7D32983 /* Visual911App.swift in Sources */,
+				F1D82A176AACE8F03D066FE7 /* VitalsClient.swift in Sources */,
+				D908BA8EC36FBD68FDABD115 /* WebRTCManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,7 +267,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = MBD2T58JVW;
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;

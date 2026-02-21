@@ -10,7 +10,12 @@ class VitalsClient {
     }
 
     func connect() {
-        guard let url = URL(string: "\(Config.vitalsURL)?call_id=\(callId)") else { return }
+        let urlString = "\(Config.vitalsURL)?call_id=\(callId)"
+        print("[VitalsClient] connecting to: \(urlString)")
+        guard let url = URL(string: urlString) else {
+            print("[VitalsClient] invalid URL")
+            return
+        }
         webSocket = session.webSocketTask(with: url)
         webSocket?.resume()
     }

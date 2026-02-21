@@ -29,6 +29,18 @@ targets:
       path: Info.plist
       properties:
         UILaunchScreen: {}
+        NSCameraUsageDescription: "Visual911 needs camera access to measure your vitals and stream video to the dispatcher."
+        NSMicrophoneUsageDescription: "Visual911 needs microphone access so the dispatcher can hear you during the emergency call."
+        NSLocationWhenInUseUsageDescription: "Visual911 sends your location to the dispatcher so emergency services can find you."
+        NSLocalNetworkUsageDescription: "Visual911 connects to the dispatch server on your local network."
+        NSBonjourServices:
+          - _http._tcp
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+          NSExceptionDomains:
+            152.23.73.108:
+              NSExceptionAllowsInsecureHTTPLoads: true
+              NSIncludesSubdomains: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.visual911.app
@@ -43,9 +55,3 @@ targets:
       - package: SmartSpectra
         product: SmartSpectraSwiftSDK
       - package: WebRTC
-      - framework: AVFoundation.framework
-        implicit: true
-      - framework: CoreLocation.framework
-        implicit: true
-      - sdk: CryptoKit.framework
-        implicit: true

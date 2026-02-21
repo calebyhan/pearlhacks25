@@ -18,6 +18,25 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_http._tcp</string>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Visual911 needs camera access to measure your vitals and stream video to the dispatcher.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Visual911 connects to the dispatch server on your local network.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Visual911 sends your location to the dispatcher so emergency services can find you.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Visual911 needs microphone access so the dispatcher can hear you during the emergency call.</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 </dict>

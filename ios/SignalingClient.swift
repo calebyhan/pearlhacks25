@@ -17,7 +17,12 @@ class SignalingClient: NSObject {
     }
 
     func connect() {
-        guard let url = URL(string: "\(Config.signalURL)?call_id=\(callId)&role=caller") else { return }
+        let urlString = "\(Config.signalURL)?call_id=\(callId)&role=caller"
+        print("[SignalingClient] connecting to: \(urlString)")
+        guard let url = URL(string: urlString) else {
+            print("[SignalingClient] invalid URL")
+            return
+        }
         webSocket = session.webSocketTask(with: url)
         webSocket?.resume()
         receive()
@@ -27,14 +32,15 @@ class SignalingClient: NSObject {
         webSocket?.receive { [weak self] result in
             switch result {
             case .success(let message):
+                print("[SignalingClient] received message")
                 if case .string(let text) = message,
                    let data = text.data(using: .utf8),
                    let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
                     self?.delegate?.signalingClient(self!, didReceive: json)
                 }
                 self?.receive()  // Continue listening
-            case .failure:
-                break  // Handle reconnection if needed
+            case .failure(let error):
+                print("[SignalingClient] receive error: \(error)")
             }
         }
     }
