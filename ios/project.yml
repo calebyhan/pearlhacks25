@@ -29,6 +29,7 @@ targets:
       path: Info.plist
       properties:
         UILaunchScreen: {}
+        CFBundleIconName: AppIcon
         NSCameraUsageDescription: "Visual911 needs camera access to measure your vitals and stream video to the dispatcher."
         NSMicrophoneUsageDescription: "Visual911 needs microphone access so the dispatcher can hear you during the emergency call."
         NSLocationWhenInUseUsageDescription: "Visual911 sends your location to the dispatcher so emergency services can find you."
@@ -48,6 +49,7 @@ targets:
         CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: "5.9"
         TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_UIStatusBarStyle: UIStatusBarStyleLightContent
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         CODE_SIGN_STYLE: Automatic

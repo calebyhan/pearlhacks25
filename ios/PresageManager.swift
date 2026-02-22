@@ -4,9 +4,9 @@ import Foundation
 
 struct VitalsReading {
     let hr: Double
-    let hrConfidence: Double
+    let hrStable: Bool
     let breathing: Double
-    let breathingConfidence: Double
+    let brStable: Bool
     let timestamp: Date
 }
 
@@ -20,14 +20,13 @@ class PresageManager: ObservableObject {
         sdk.setApiKey(Config.presageApiKey)
         sdk.setSmartSpectraMode(.continuous)
         sdk.setCameraPosition(.front)
-        sdk.setImageOutputEnabled(false) // headless — no preview needed
+        sdk.setImageOutputEnabled(true) // enables vitalsProcessor.imageOutput for camera preview
     }
 
     func startMeasuring() {
         processor.startProcessing()
         processor.startRecording()
 
-        // Observe MetricsBuffer updates from the SDK singleton
         sdk.$metricsBuffer
             .compactMap { $0 }
             .sink { [weak self] buffer in
@@ -38,9 +37,9 @@ class PresageManager: ObservableObject {
 
                 let reading = VitalsReading(
                     hr: Double(hrVal.value),
-                    hrConfidence: Double(hrVal.confidence),
+                    hrStable: hrVal.stable,
                     breathing: Double(breathVal.value),
-                    breathingConfidence: Double(breathVal.confidence),
+                    brStable: breathVal.stable,
                     timestamp: Date()
                 )
                 DispatchQueue.main.async {

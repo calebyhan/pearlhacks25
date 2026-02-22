@@ -15,6 +15,8 @@ enum CallState {
 class CallManager: ObservableObject {
     @Published var state: CallState = .idle
     @Published var lastVitals: VitalsReading?
+    @Published var lastLocation: CLLocationCoordinate2D?
+    @Published var isMuted: Bool = false
 
     private var callId: String?
     private let presage = PresageManager()
@@ -35,10 +37,9 @@ class CallManager: ObservableObject {
     private func startPresageScan() {
         presage.startMeasuring()
 
-        // Listen for first confident reading
+        // Capture first reading (stable or not — stability shown in UI)
         presage.$latestReading
             .compactMap { $0 }
-            .filter { $0.hrConfidence > 0.7 }
             .first()
             .sink { [weak self] reading in
                 self?.lastVitals = reading
@@ -47,8 +48,15 @@ class CallManager: ObservableObject {
 
         // Stop after 15 seconds regardless
         DispatchQueue.main.asyncAfter(deadline: .now() + 15) { [weak self] in
-            self?.presage.stopMeasuring()
-            self?.initiateCall()
+            guard let self else { return }
+            self.presage.stopMeasuring()
+            // One extra main-queue cycle lets any pending latestReading dispatch land
+            DispatchQueue.main.async {
+                if self.lastVitals == nil {
+                    self.lastVitals = self.presage.latestReading
+                }
+                self.initiateCall()
+            }
         }
     }
 
@@ -63,6 +71,7 @@ class CallManager: ObservableObject {
             ["lat": $0.latitude, "lng": $0.longitude]
         } ?? [:]
 
+        lastLocation = location
         transition(to: .initiating)
 
         signalingClient = SignalingClient(callId: callId, delegate: self)
@@ -98,6 +107,15 @@ class CallManager: ObservableObject {
         webrtc.createOffer(callId: callId ?? "") { [weak self] sdp in
             self?.signalingClient?.send(sdp)
         }
+    }
+
+    func toggleMute() {
+        isMuted.toggle()
+        webrtc?.setAudioMuted(isMuted)
+    }
+
+    func renderLocalVideo(to renderer: RTCVideoRenderer) {
+        webrtc?.renderLocalVideo(to: renderer)
     }
 
     func endCall(reason: String = "caller_ended") {
@@ -163,6 +181,10 @@ extension CallManager: WebRTCManagerDelegate {
             switch state {
             case .connected, .completed:
                 self?.transition(to: .active)
+                // Resend cached vitals — dispatcher_ws is now guaranteed set
+                if let vitals = self?.lastVitals {
+                    self?.vitalsClient?.send(reading: vitals)
+                }
             case .failed:
                 self?.endCall(reason: "connection_failed")
             case .disconnected:

@@ -16,7 +16,9 @@ class VitalsClient {
             print("[VitalsClient] invalid URL")
             return
         }
-        webSocket = session.webSocketTask(with: url)
+        var request = URLRequest(url: url)
+        request.setValue("true", forHTTPHeaderField: "ngrok-skip-browser-warning")
+        webSocket = session.webSocketTask(with: request)
         webSocket?.resume()
     }
 
@@ -25,9 +27,9 @@ class VitalsClient {
             "type": "vitals",
             "call_id": callId,
             "hr": reading.hr,
-            "hrConfidence": reading.hrConfidence,
+            "hrConfidence": reading.hrStable ? 1.0 : 0.0,
             "breathing": reading.breathing,
-            "breathingConfidence": reading.breathingConfidence,
+            "breathingConfidence": reading.brStable ? 1.0 : 0.0,
             "timestamp": reading.timestamp.timeIntervalSince1970
         ]
         guard let data = try? JSONSerialization.data(withJSONObject: payload),

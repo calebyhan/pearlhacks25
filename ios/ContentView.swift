@@ -12,7 +12,9 @@ struct ContentView: View {
                 IdleView()
             case .scanning:
                 ScanningView()
-            case .initiating, .connecting, .active:
+            case .initiating, .connecting:
+                InitiatingView()
+            case .active:
                 ActiveCallView()
             case .cleanup:
                 ProgressView("Ending call…")

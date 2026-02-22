@@ -35,7 +35,9 @@ class AudioTap {
 
     private func connectWebSocket() {
         guard let url = URL(string: "\(Config.audioURL)?call_id=\(callId)") else { return }
-        webSocket = session.webSocketTask(with: url)
+        var request = URLRequest(url: url)
+        request.setValue("true", forHTTPHeaderField: "ngrok-skip-browser-warning")
+        webSocket = session.webSocketTask(with: request)
         webSocket?.resume()
     }
 

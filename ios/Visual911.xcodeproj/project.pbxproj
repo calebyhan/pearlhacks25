@@ -17,6 +17,8 @@
 		9F49FD3CCB6867C45EFC434D /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_9AD25E12-4E51-494F-8656-CA7384142D36" /* Config.swift */; };
 		A7418FFAB74AE1AA5B06346B /* ScanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B366630D4640B88F6E132A /* ScanningView.swift */; };
 		C861ADD9F12F0EC629E7D3A4 /* IdleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E9A66716FB05EB0F78CE63 /* IdleView.swift */; };
+		B3A1F2CD8E5047AC9D123456 /* InitiatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A1F2CD8E5047AC9D654321 /* InitiatingView.swift */; };
+		C4D5E6F7A8B9C0D1E2F30001 /* RTCLocalVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4D5E6F7A8B9C0D1E2F30002 /* RTCLocalVideoView.swift */; };
 		D908BA8EC36FBD68FDABD115 /* WebRTCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_3D7FADBC-E462-43D7-928D-263948280CD7" /* WebRTCManager.swift */; };
 		DDCAECF4ECAD7CD29E2A50F3 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 398379ABCA73A4A7486D5DEE /* WebRTC */; };
 		E9468A34BB631D6C05917A54 /* CallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_C288FAF5-99DF-4F18-807E-0AA912938D94" /* CallManager.swift */; };
@@ -29,6 +31,8 @@
 		37B366630D4640B88F6E132A /* ScanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanningView.swift; sourceTree = "<group>"; };
 		4B22ECEBE45369867144032F /* ActiveCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveCallView.swift; sourceTree = "<group>"; };
 		91E9A66716FB05EB0F78CE63 /* IdleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleView.swift; sourceTree = "<group>"; };
+		B3A1F2CD8E5047AC9D654321 /* InitiatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitiatingView.swift; sourceTree = "<group>"; };
+		C4D5E6F7A8B9C0D1E2F30002 /* RTCLocalVideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTCLocalVideoView.swift; sourceTree = "<group>"; };
 		"TEMP_3D7FADBC-E462-43D7-928D-263948280CD7" /* WebRTCManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRTCManager.swift; sourceTree = "<group>"; };
 		"TEMP_78D8DA44-70BB-4F87-9814-46D39600C3EF" /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		"TEMP_832F670A-C68A-4816-A343-CAB4E4E747CF" /* SignalingClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalingClient.swift; sourceTree = "<group>"; };
@@ -93,6 +97,8 @@
 			children = (
 				4B22ECEBE45369867144032F /* ActiveCallView.swift */,
 				91E9A66716FB05EB0F78CE63 /* IdleView.swift */,
+				B3A1F2CD8E5047AC9D654321 /* InitiatingView.swift */,
+				C4D5E6F7A8B9C0D1E2F30002 /* RTCLocalVideoView.swift */,
 				37B366630D4640B88F6E132A /* ScanningView.swift */,
 			);
 			path = Views;
@@ -163,6 +169,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				F274FC3CC222B535550C460E /* ActiveCallView.swift in Sources */,
+				B3A1F2CD8E5047AC9D123456 /* InitiatingView.swift in Sources */,
+				C4D5E6F7A8B9C0D1E2F30001 /* RTCLocalVideoView.swift in Sources */,
 				27580F30EF8AD9D3346CBCB8 /* AudioTap.swift in Sources */,
 				E9468A34BB631D6C05917A54 /* CallManager.swift in Sources */,
 				9F49FD3CCB6867C45EFC434D /* Config.swift in Sources */,

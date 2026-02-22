@@ -23,7 +23,9 @@ class SignalingClient: NSObject {
             print("[SignalingClient] invalid URL")
             return
         }
-        webSocket = session.webSocketTask(with: url)
+        var request = URLRequest(url: url)
+        request.setValue("true", forHTTPHeaderField: "ngrok-skip-browser-warning")
+        webSocket = session.webSocketTask(with: request)
         webSocket?.resume()
         receive()
     }

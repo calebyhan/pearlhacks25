@@ -1,75 +1,79 @@
 import SwiftUI
+import WebRTC
 
 struct ActiveCallView: View {
     @EnvironmentObject var callManager: CallManager
 
     var body: some View {
-        VStack(spacing: 16) {
-            // Status
-            HStack {
-                Circle()
-                    .fill(statusColor)
-                    .frame(width: 10, height: 10)
-                Text(statusText)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                Spacer()
-            }
-            .padding(.horizontal)
+        ZStack(alignment: .bottom) {
+            Color(red: 18/255, green: 18/255, blue: 18/255)
+                .ignoresSafeArea()
 
-            // Vitals display
-            if let vitals = callManager.lastVitals {
-                HStack(spacing: 24) {
-                    VStack {
-                        Text("\(Int(vitals.hr))")
-                            .font(.system(size: 48, weight: .bold))
-                        Text("bpm")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    VStack {
-                        Text("\(Int(vitals.breathing))")
-                            .font(.system(size: 48, weight: .bold))
-                        Text("/min")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+            // MARK: Full-screen local video feed
+            RTCLocalVideoView(manager: callManager)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .ignoresSafeArea(edges: .top)
+
+            // MARK: Overlays on the video
+            VStack {
+                // Camera icon — top-right corner of video area
+                HStack {
+                    Spacer()
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color(white: 0.4).opacity(0.54))
+                            .frame(width: 40, height: 40)
+                        Image(systemName: "camera.rotate")
+                            .font(.system(size: 18))
+                            .foregroundColor(.white)
                     }
                 }
-                .padding()
+                .padding(.top, 18)
+                .padding(.trailing, 10)
+
+                Spacer()
+
+                // "Dispatcher can see your video and location"
+                Text("Dispatcher can see your video and location")
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundColor(Color(white: 0.51))
+                    .padding(.bottom, 12)
             }
 
-            Spacer()
+            // MARK: Bottom controls
+            HStack(spacing: 0) {
+                // Mute
+                Button(action: { callManager.toggleMute() }) {
+                    Text(callManager.isMuted ? "Unmute" : "Mute")
+                        .font(.system(size: 18, weight: .regular))
+                        .foregroundColor(.black)
+                        .frame(width: 140, height: 49)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.white)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color(white: 0.51), lineWidth: 1)
+                                )
+                        )
+                }
 
-            // End call button
-            Button(action: {
-                callManager.endCall()
-            }) {
-                Text("End Call")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Color.red))
+                Spacer()
+
+                // End call
+                Button(action: { callManager.endCall() }) {
+                    Text("End call")
+                        .font(.system(size: 18, weight: .regular))
+                        .foregroundColor(.white)
+                        .frame(width: 140, height: 49)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(red: 252/255, green: 87/255, blue: 87/255))
+                        )
+                }
             }
-            .padding()
-        }
-    }
-
-    private var statusColor: Color {
-        switch callManager.state {
-        case .initiating: return .yellow
-        case .connecting: return .orange
-        case .active: return .green
-        default: return .gray
-        }
-    }
-
-    private var statusText: String {
-        switch callManager.state {
-        case .initiating: return "Waiting for dispatcher..."
-        case .connecting: return "Connecting..."
-        case .active: return "Connected"
-        default: return ""
+            .padding(.horizontal, 36)
+            .padding(.bottom, 40)
         }
     }
 }

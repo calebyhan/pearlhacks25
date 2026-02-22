@@ -138,6 +138,12 @@ class WebRTCManager: NSObject {
         localVideoTrack?.add(renderer)
     }
 
+    func setAudioMuted(_ muted: Bool) {
+        peerConnection.transceivers
+            .compactMap { $0.sender.track as? RTCAudioTrack }
+            .forEach { $0.isEnabled = !muted }
+    }
+
     func disconnect() {
         capturer?.stopCapture()
         peerConnection.close()
