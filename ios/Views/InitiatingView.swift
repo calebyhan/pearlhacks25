@@ -17,9 +17,7 @@ struct InitiatingView: View {
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundColor(.white)
                     Spacer()
-                    Circle()
-                        .fill(Color(white: 0.6))
-                        .frame(width: 40, height: 40)
+                    EKGLogoView(size: 40)
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 8)

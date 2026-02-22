@@ -64,6 +64,9 @@ fastlane/test_output
 .claude/*
 CLAUDE.md
 
+# iOS secrets
+ios/Secrets.swift
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

@@ -1,4 +1,5 @@
 import WebRTC
+import UIKit
 
 protocol WebRTCManagerDelegate: AnyObject {
     func webRTCManager(_ manager: WebRTCManager, didGenerateCandidate candidate: RTCIceCandidate)
@@ -17,6 +18,7 @@ class WebRTCManager: NSObject {
     private var peerConnection: RTCPeerConnection!
     private var capturer: RTCCameraVideoCapturer?
     private var localVideoTrack: RTCVideoTrack?
+    private let frameGrabber = FrameGrabber()
 
     init(delegate: WebRTCManagerDelegate) {
         self.delegate = delegate
@@ -59,6 +61,7 @@ class WebRTCManager: NSObject {
         peerConnection.add(localVideoTrack!, streamIds: ["stream0"])
 
         capturer = RTCCameraVideoCapturer(delegate: videoSource)
+        localVideoTrack?.add(frameGrabber)
         startCameraCapture(retryCount: 0)
     }
 
@@ -138,6 +141,10 @@ class WebRTCManager: NSObject {
         localVideoTrack?.add(renderer)
     }
 
+    func captureJPEG() -> Data? {
+        frameGrabber.captureJPEG()
+    }
+
     func setAudioMuted(_ muted: Bool) {
         peerConnection.transceivers
             .compactMap { $0.sender.track as? RTCAudioTrack }
@@ -147,6 +154,33 @@ class WebRTCManager: NSObject {
     func disconnect() {
         capturer?.stopCapture()
         peerConnection.close()
+    }
+}
+
+// Captures the latest camera frame from the local WebRTC video track as JPEG
+private class FrameGrabber: NSObject, RTCVideoRenderer {
+    private var latestPixelBuffer: CVPixelBuffer?
+    private let lock = NSLock()
+    private static let ciContext = CIContext()
+
+    func setSize(_ size: CGSize) {}
+
+    func renderFrame(_ frame: RTCVideoFrame?) {
+        guard let frame,
+              let cvFrame = frame.buffer as? RTCCVPixelBuffer else { return }
+        lock.lock()
+        latestPixelBuffer = cvFrame.pixelBuffer
+        lock.unlock()
+    }
+
+    func captureJPEG(compressionQuality: CGFloat = 0.5) -> Data? {
+        lock.lock()
+        let pb = latestPixelBuffer
+        lock.unlock()
+        guard let pb else { return nil }
+        let ci = CIImage(cvPixelBuffer: pb)
+        guard let cg = FrameGrabber.ciContext.createCGImage(ci, from: ci.extent) else { return nil }
+        return UIImage(cgImage: cg).jpegData(compressionQuality: compressionQuality)
     }
 }
 

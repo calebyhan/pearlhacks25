@@ -1,11 +1,17 @@
 import asyncio
 import base64
+import io
 import json
 import logging
 import os
+import struct
 import time
 import uuid
+import wave
 from typing import Optional
+
+from dotenv import load_dotenv
+load_dotenv()
 
 import aiohttp
 from aiohttp import web
@@ -32,11 +38,10 @@ dispatcher_connections: set[web.WebSocketResponse] = set()
 
 # ─── Gemini ───────────────────────────────────────────────────────────────────
 
-GEMINI_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
+GEMINI_MODEL = "gemini-2.5-flash"
 
-SYSTEM_PROMPT = """You are an AI emergency triage assistant monitoring a 911 call.
-Analyze audio for emergency indicators: keywords, emotional state, breathing patterns, background sounds.
-When your assessment changes, output ONLY a JSON object — no preamble, no markdown:
+SYSTEM_PROMPT = """You are an AI emergency triage assistant analyzing a 911 call audio clip.
+Output ONLY a JSON object — no preamble, no markdown, no extra text:
 {
   "situation_summary": "one sentence description",
   "detected_keywords": ["list", "of", "keywords"],
@@ -46,110 +51,154 @@ When your assessment changes, output ONLY a JSON object — no preamble, no mark
   "can_speak": true
 }
 Severity: 1=minor, 2=moderate, 3=urgent, 4=serious, 5=life-threatening.
-Keep output under 100 tokens. Speed over verbosity. Output only on meaningful changes."""
+Keep output under 100 tokens. Speed over verbosity."""
 
-GEMINI_CONFIG = {
-    "response_modalities": ["TEXT"],
-    "system_instruction": SYSTEM_PROMPT,
-    "tools": [
-        types.Tool(function_declarations=[
-            types.FunctionDeclaration(
-                name="flag_critical",
-                description="Immediately flag this call as life-threatening",
-                parameters=types.Schema(
-                    type=types.Type.OBJECT,
-                    properties={
-                        "reason": types.Schema(type=types.Type.STRING),
-                        "severity": types.Schema(type=types.Type.INTEGER),
-                    }
-                ),
-                behavior=types.Behavior.NON_BLOCKING,
-            )
-        ])
-    ],
-}
+ANALYSIS_INTERVAL = 10  # seconds between Gemini calls
+AUDIO_SAMPLE_RATE = 16000
+AUDIO_BYTES_PER_SAMPLE = 2  # 16-bit PCM
+
+
+def pcm_to_wav(pcm_bytes: bytes, sample_rate: int = 16000, channels: int = 1, sample_width: int = 2) -> bytes:
+    """Wrap raw PCM bytes in a WAV container so Gemini generateContent can process it."""
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as wf:
+        wf.setnchannels(channels)
+        wf.setsampwidth(sample_width)
+        wf.setframerate(sample_rate)
+        wf.writeframes(pcm_bytes)
+    return buf.getvalue()
 
 
 async def gemini_session_task(call_id: str, audio_queue: asyncio.Queue, dashboard_ws_getter):
     """
-    Asyncio task that manages one Gemini Live API session per call.
-    Consumes from audio_queue (PCM chunks and JPEG frames).
-    Emits parsed triage JSON to the dashboard WebSocket.
+    Periodically drains the audio queue, sends buffered PCM (as WAV) + latest
+    video frame to Gemini generateContent, and forwards triage JSON to the dashboard.
     """
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    logger.info(f"[{call_id}] Gemini analysis task started")
+
+    audio_buffer = bytearray()
+    latest_frame: str | None = None  # base64 JPEG
+    previous_summary: str = ""  # cumulative context across analysis rounds
+    analysis_count = 0
 
     try:
-        async with client.aio.live.connect(model=GEMINI_MODEL, config=GEMINI_CONFIG) as session:
-            logger.info(f"[{call_id}] Gemini session opened")
+        while True:
+            # Collect audio for ANALYSIS_INTERVAL seconds
+            deadline = asyncio.get_event_loop().time() + ANALYSIS_INTERVAL
+            while asyncio.get_event_loop().time() < deadline:
+                timeout = deadline - asyncio.get_event_loop().time()
+                try:
+                    item = await asyncio.wait_for(audio_queue.get(), timeout=timeout)
+                except asyncio.TimeoutError:
+                    break
+                if item is None:  # Sentinel — call ended
+                    return
+                if item["type"] == "audio":
+                    audio_buffer.extend(item["data"])
+                elif item["type"] == "frame":
+                    latest_frame = item["data"]  # keep most recent frame
 
-            async def send_loop():
-                """Pull from queue, forward to Gemini."""
-                while True:
-                    item = await audio_queue.get()
-                    if item is None:  # Sentinel to stop
-                        break
-                    if item["type"] == "audio":
-                        await session.send(input={
-                            "realtime_input": {
-                                "audio": {
-                                    "data": base64.b64encode(item["data"]).decode(),
-                                    "mime_type": "audio/pcm;rate=16000"
-                                }
-                            }
+            if not audio_buffer:
+                continue
+
+            chunk = bytes(audio_buffer)
+            audio_buffer.clear()
+            analysis_count += 1
+
+            duration_s = len(chunk) // (AUDIO_BYTES_PER_SAMPLE * AUDIO_SAMPLE_RATE)
+            logger.info(f"[{call_id}] Sending {duration_s}s audio to Gemini (round {analysis_count})")
+
+            # Convert raw PCM to WAV — generateContent does NOT support audio/pcm
+            wav_bytes = pcm_to_wav(chunk)
+
+            try:
+                # Build content parts
+                parts: list[types.Part] = [
+                    types.Part(
+                        inline_data=types.Blob(
+                            data=wav_bytes,
+                            mime_type="audio/wav"
+                        )
+                    ),
+                ]
+
+                # Include latest video frame if available
+                if latest_frame:
+                    try:
+                        frame_bytes = base64.b64decode(latest_frame)
+                        parts.append(types.Part(
+                            inline_data=types.Blob(
+                                data=frame_bytes,
+                                mime_type="image/jpeg"
+                            )
+                        ))
+                    except Exception:
+                        pass  # skip bad frame data
+
+                # Build prompt with cumulative context
+                prompt = "Analyze this 911 call audio clip and output triage JSON."
+                if previous_summary:
+                    prompt = (
+                        f"Previous analysis: {previous_summary}\n\n"
+                        f"New audio segment (update #{analysis_count}). "
+                        f"Update your triage based on this new audio. Output triage JSON."
+                    )
+                if latest_frame:
+                    prompt += " A camera frame from the caller is also attached."
+
+                parts.append(types.Part(text=prompt))
+
+                response = await client.aio.models.generate_content(
+                    model=GEMINI_MODEL,
+                    contents=parts,
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_PROMPT,
+                        temperature=0.1,
+                    )
+                )
+                text = response.text.strip() if response.text else ""
+                logger.info(f"[{call_id}] Gemini response: {text[:200]}")
+
+                # Extract JSON from response
+                start = text.find("{")
+                end = text.rfind("}") + 1
+                if start >= 0 and end > start:
+                    report = json.loads(text[start:end])
+                    # Save summary for next round
+                    previous_summary = report.get("situation_summary", previous_summary)
+                    dashboard_ws = dashboard_ws_getter(call_id)
+                    if dashboard_ws and not dashboard_ws.closed:
+                        await dashboard_ws.send_json({
+                            "type": "triage_update",
+                            "call_id": call_id,
+                            "report": report
                         })
-                    elif item["type"] == "frame":
-                        await session.send(input={
-                            "realtime_input": {
-                                "video": {
-                                    "data": item["data"],  # Already base64
-                                    "mime_type": "image/jpeg"
-                                }
-                            }
-                        })
+                else:
+                    logger.warning(f"[{call_id}] Gemini returned no JSON: {text[:200]}")
 
-            async def receive_loop():
-                """Receive Gemini output, parse and forward to dashboard."""
-                text_buffer = ""
-                async for response in session.receive():
-                    if response.text:
-                        text_buffer += response.text
-                        # Try to parse complete JSON
-                        if "}" in text_buffer:
-                            try:
-                                report = json.loads(text_buffer.strip())
-                                text_buffer = ""
-                                dashboard_ws = dashboard_ws_getter(call_id)
-                                if dashboard_ws and not dashboard_ws.closed:
-                                    await dashboard_ws.send_json({
-                                        "type": "triage_update",
-                                        "call_id": call_id,
-                                        "report": report
-                                    })
-                            except json.JSONDecodeError:
-                                # Buffer overflow protection for malformed Gemini JSON
-                                if len(text_buffer) > 2000:
-                                    logger.warning(f"[{call_id}] Discarding malformed Gemini buffer")
-                                    text_buffer = ""
-
-                    # Handle tool calls
-                    if response.tool_call:
-                        for fc in response.tool_call.function_calls:
-                            if fc.name == "flag_critical":
-                                dashboard_ws = dashboard_ws_getter(call_id)
-                                if dashboard_ws and not dashboard_ws.closed:
-                                    await dashboard_ws.send_json({
-                                        "type": "critical_flag",
-                                        "call_id": call_id,
-                                        "reason": fc.args.get("reason", ""),
-                                        "severity": fc.args.get("severity", 5)
-                                    })
-
-            await asyncio.gather(send_loop(), receive_loop())
+            except asyncio.CancelledError:
+                raise
+            except Exception as e:
+                logger.error(f"[{call_id}] Gemini analysis error: {e}")
+                # Notify dashboard so it doesn't stay on "Waiting" forever
+                dashboard_ws = dashboard_ws_getter(call_id)
+                if dashboard_ws and not dashboard_ws.closed:
+                    await dashboard_ws.send_json({
+                        "type": "triage_update",
+                        "call_id": call_id,
+                        "report": {
+                            "situation_summary": f"AI analysis error — retrying... ({e.__class__.__name__})",
+                            "severity": 0,
+                            "caller_emotional_state": "unknown",
+                            "recommended_response_type": "unknown",
+                            "can_speak": True,
+                            "detected_keywords": []
+                        }
+                    })
 
     except asyncio.CancelledError:
-        logger.info(f"[{call_id}] Gemini session cancelled")
-    except Exception as e:
-        logger.error(f"[{call_id}] Gemini error: {e}")
+        logger.info(f"[{call_id}] Gemini task cancelled")
 
 
 # ─── WebSocket Handlers ────────────────────────────────────────────────────────
@@ -193,7 +242,14 @@ async def handle_signal(request: web.Request) -> web.WebSocketResponse:
                 "gemini_task": None,
                 "location": data.get("location", {}),
                 "started_at": time.time(),
+                "last_vitals": None,
             }
+
+            # Replay any vitals that arrived before call was registered
+            buffered = pending_vitals.pop(call_id, None)
+            if buffered:
+                logger.info(f"[{call_id}] Replaying buffered vitals")
+                active_calls[call_id]["last_vitals"] = buffered
 
             # Notify all connected dispatchers
             for dash_ws in dispatcher_connections.copy():
@@ -255,6 +311,10 @@ async def handle_audio(request: web.Request) -> web.WebSocketResponse:
     return ws
 
 
+# Buffer vitals that arrive before call_initiated registers the call
+pending_vitals: dict[str, dict] = {}
+
+
 async def handle_vitals(request: web.Request) -> web.WebSocketResponse:
     ws = web.WebSocketResponse()
     await ws.prepare(request)
@@ -265,16 +325,22 @@ async def handle_vitals(request: web.Request) -> web.WebSocketResponse:
         if msg.type != aiohttp.WSMsgType.TEXT:
             continue
 
-        call = active_calls.get(call_id)
-        if not call:
-            continue
-
         try:
             vitals = json.loads(msg.data)
         except json.JSONDecodeError:
             continue
 
-        # Forward to dashboard
+        call = active_calls.get(call_id)
+        if not call:
+            # Call not registered yet — buffer so it can be replayed later
+            logger.info(f"[{call_id}] Vitals arrived before call registered, buffering")
+            pending_vitals[call_id] = vitals
+            continue
+
+        logger.info(f"[{call_id}] Vitals received: HR={vitals.get('hr')} BR={vitals.get('breathing')}")
+        call["last_vitals"] = vitals
+
+        # Forward to dashboard if already connected
         dashboard_ws = call.get("dashboard_ws")
         if dashboard_ws and not dashboard_ws.closed:
             await dashboard_ws.send_json({
@@ -320,6 +386,11 @@ async def handle_dashboard(request: web.Request) -> web.WebSocketResponse:
                         )
                     )
                     call["gemini_task"] = task
+
+                # Replay cached vitals so dispatcher sees them immediately on answer
+                last_vitals = call.get("last_vitals")
+                if last_vitals:
+                    await ws.send_json({"type": "vitals", "call_id": call_id, **last_vitals})
 
                 caller_ws = call.get("caller_ws")
                 if caller_ws and not caller_ws.closed:

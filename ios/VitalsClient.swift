@@ -23,13 +23,15 @@ class VitalsClient {
     }
 
     func send(reading: VitalsReading) {
+        // Send 0.5 for unstable readings instead of 0.0 so the dashboard
+        // still displays the value (with a "weak signal" indicator).
         let payload: [String: Any] = [
             "type": "vitals",
             "call_id": callId,
             "hr": reading.hr,
-            "hrConfidence": reading.hrStable ? 1.0 : 0.0,
+            "hrConfidence": reading.hrStable ? 1.0 : 0.5,
             "breathing": reading.breathing,
-            "breathingConfidence": reading.brStable ? 1.0 : 0.0,
+            "breathingConfidence": reading.brStable ? 1.0 : 0.5,
             "timestamp": reading.timestamp.timeIntervalSince1970
         ]
         guard let data = try? JSONSerialization.data(withJSONObject: payload),

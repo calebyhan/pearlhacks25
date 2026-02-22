@@ -6,6 +6,7 @@ class AudioTap {
     private var webSocket: URLSessionWebSocketTask?
     private var frameTimer: Timer?
     private var session: URLSession
+    weak var webRTCManager: WebRTCManager?
 
     init(callId: String) {
         self.callId = callId
@@ -76,8 +77,11 @@ class AudioTap {
     }
 
     private func captureAndSendFrame() {
-        // TODO: Capture snapshot from the current camera session
-        // For hackathon: grab from a shared RTCVideoRenderer or AVCaptureVideoDataOutput tap
+        guard let jpeg = webRTCManager?.captureJPEG() else { return }
+        let payload: [String: Any] = ["type": "frame", "data": jpeg.base64EncodedString()]
+        guard let json = try? JSONSerialization.data(withJSONObject: payload),
+              let jsonStr = String(data: json, encoding: .utf8) else { return }
+        webSocket?.send(.string(jsonStr)) { _ in }
     }
 
     @objc private func handleRouteChange(_ notification: Notification) {

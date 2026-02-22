@@ -11,14 +11,16 @@
 		19DCAC17892E15F41BD00090 /* SmartSpectraSwiftSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 52D88B10B7A7E30062959FA2 /* SmartSpectraSwiftSDK */; };
 		27580F30EF8AD9D3346CBCB8 /* AudioTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_8DAE9A13-4D29-481C-90F0-969C525BD972" /* AudioTap.swift */; };
 		58FDFC9C9B71D20DA7D32983 /* Visual911App.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_C052B6E9-A4ED-4A9E-9563-B62CBE05E525" /* Visual911App.swift */; };
+		5A9337C32F4ABA69008AAF38 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9337C22F4ABA69008AAF38 /* Secrets.swift */; };
+		5ACE72E32F4ABE0200A56ED4 /* EKGLogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE72E22F4ABE0200A56ED4 /* EKGLogoView.swift */; };
 		635B432EA7F331995A4F2B5D /* TURNCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_943FA7E8-2F3E-4777-8F64-51FA2F5417B4" /* TURNCredentials.swift */; };
 		7176C3A4574567FB84F8E017 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_78D8DA44-70BB-4F87-9814-46D39600C3EF" /* ContentView.swift */; };
 		894BE5AF0C827FEEC44CC8A9 /* PresageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_A1B2DEAF-3A10-47B0-BFE5-5FC8F90945FA" /* PresageManager.swift */; };
 		9F49FD3CCB6867C45EFC434D /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_9AD25E12-4E51-494F-8656-CA7384142D36" /* Config.swift */; };
 		A7418FFAB74AE1AA5B06346B /* ScanningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B366630D4640B88F6E132A /* ScanningView.swift */; };
-		C861ADD9F12F0EC629E7D3A4 /* IdleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E9A66716FB05EB0F78CE63 /* IdleView.swift */; };
 		B3A1F2CD8E5047AC9D123456 /* InitiatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A1F2CD8E5047AC9D654321 /* InitiatingView.swift */; };
 		C4D5E6F7A8B9C0D1E2F30001 /* RTCLocalVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4D5E6F7A8B9C0D1E2F30002 /* RTCLocalVideoView.swift */; };
+		C861ADD9F12F0EC629E7D3A4 /* IdleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E9A66716FB05EB0F78CE63 /* IdleView.swift */; };
 		D908BA8EC36FBD68FDABD115 /* WebRTCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_3D7FADBC-E462-43D7-928D-263948280CD7" /* WebRTCManager.swift */; };
 		DDCAECF4ECAD7CD29E2A50F3 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 398379ABCA73A4A7486D5DEE /* WebRTC */; };
 		E9468A34BB631D6C05917A54 /* CallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_C288FAF5-99DF-4F18-807E-0AA912938D94" /* CallManager.swift */; };
@@ -30,6 +32,8 @@
 		02AFEC396851060C54EC59E3 /* Visual911.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Visual911.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37B366630D4640B88F6E132A /* ScanningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanningView.swift; sourceTree = "<group>"; };
 		4B22ECEBE45369867144032F /* ActiveCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveCallView.swift; sourceTree = "<group>"; };
+		5A9337C22F4ABA69008AAF38 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
+		5ACE72E22F4ABE0200A56ED4 /* EKGLogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKGLogoView.swift; sourceTree = "<group>"; };
 		91E9A66716FB05EB0F78CE63 /* IdleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleView.swift; sourceTree = "<group>"; };
 		B3A1F2CD8E5047AC9D654321 /* InitiatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitiatingView.swift; sourceTree = "<group>"; };
 		C4D5E6F7A8B9C0D1E2F30002 /* RTCLocalVideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTCLocalVideoView.swift; sourceTree = "<group>"; };
@@ -86,6 +90,7 @@
 		97B1065B431B647A206E60F7 = {
 			isa = PBXGroup;
 			children = (
+				5A9337C22F4ABA69008AAF38 /* Secrets.swift */,
 				A85E9578C264EFF0F8708FF7 /* Views */,
 				108B700DB484DF9EEDEABF52 /* Products */,
 				5A9337C12F4A6A11008AAF38 /* Recovered References */,
@@ -95,6 +100,7 @@
 		A85E9578C264EFF0F8708FF7 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				5ACE72E22F4ABE0200A56ED4 /* EKGLogoView.swift */,
 				4B22ECEBE45369867144032F /* ActiveCallView.swift */,
 				91E9A66716FB05EB0F78CE63 /* IdleView.swift */,
 				B3A1F2CD8E5047AC9D654321 /* InitiatingView.swift */,
@@ -169,12 +175,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				F274FC3CC222B535550C460E /* ActiveCallView.swift in Sources */,
+				5A9337C32F4ABA69008AAF38 /* Secrets.swift in Sources */,
 				B3A1F2CD8E5047AC9D123456 /* InitiatingView.swift in Sources */,
 				C4D5E6F7A8B9C0D1E2F30001 /* RTCLocalVideoView.swift in Sources */,
 				27580F30EF8AD9D3346CBCB8 /* AudioTap.swift in Sources */,
 				E9468A34BB631D6C05917A54 /* CallManager.swift in Sources */,
 				9F49FD3CCB6867C45EFC434D /* Config.swift in Sources */,
 				7176C3A4574567FB84F8E017 /* ContentView.swift in Sources */,
+				5ACE72E32F4ABE0200A56ED4 /* EKGLogoView.swift in Sources */,
 				C861ADD9F12F0EC629E7D3A4 /* IdleView.swift in Sources */,
 				894BE5AF0C827FEEC44CC8A9 /* PresageManager.swift in Sources */,
 				A7418FFAB74AE1AA5B06346B /* ScanningView.swift in Sources */,

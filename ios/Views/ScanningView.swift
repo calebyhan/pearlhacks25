@@ -23,9 +23,7 @@ struct ScanningView: View {
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundColor(.white)
                     Spacer()
-                    Circle()
-                        .fill(Color(white: 0.6))
-                        .frame(width: 40, height: 40)
+                    EKGLogoView(size: 40)
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 8)
@@ -38,7 +36,7 @@ struct ScanningView: View {
                     .padding(.top, 16)
 
                 // MARK: Camera preview
-                ZStack {
+                ZStack(alignment: .bottom) {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color(white: 0.08))
                         .frame(height: 205)
@@ -60,6 +58,31 @@ struct ScanningView: View {
                                 .font(.system(size: 13))
                                 .foregroundColor(Color(white: 0.4))
                         }
+                        .frame(height: 205)
+                    }
+
+                    // MARK: Scan feedback banner
+                    if let feedback = callManager.scanFeedback {
+                        HStack(spacing: 8) {
+                            Image(systemName: feedback.icon)
+                                .font(.system(size: 16, weight: .semibold))
+                            Text(feedback.message)
+                                .font(.system(size: 14, weight: .medium))
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.8)
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            feedback.isError
+                                ? Color(red: 0.85, green: 0.2, blue: 0.2).opacity(0.85)
+                                : Color(red: 0.13, green: 0.6, blue: 0.3).opacity(0.85)
+                        )
+                        .clipShape(RoundedCorner(radius: 10, corners: [.bottomLeft, .bottomRight]))
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .animation(.easeInOut(duration: 0.3), value: callManager.scanFeedback)
                     }
                 }
                 .padding(.horizontal, 40)
@@ -103,6 +126,13 @@ struct ScanningView: View {
         }
         .onAppear { startProgress() }
         .onDisappear { timer?.invalidate() }
+        .onChange(of: callManager.scanComplete) { done in
+            if done {
+                // Snap progress bar to full when scan finishes early
+                timer?.invalidate()
+                withAnimation(.easeOut(duration: 0.3)) { progress = 1.0 }
+            }
+        }
     }
 
     private func startProgress() {
@@ -171,5 +201,22 @@ private struct VitalsCard: View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color(white: 0.85), lineWidth: 1)
         )
+    }
+}
+
+// MARK: - Rounded Corner Shape
+
+/// Shape that rounds only the specified corners.
+private struct RoundedCorner: Shape {
+    var radius: CGFloat
+    var corners: UIRectCorner
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
     }
 }

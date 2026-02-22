@@ -6,8 +6,6 @@
   <title>Visual911 — Dispatcher</title>
   <link rel="icon" type="image/svg+xml" href="/static/logo.svg">
 
-  <!-- Chart.js for vitals graph -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <!-- Leaflet.js for map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -24,84 +22,108 @@
       align-items: center;
       gap: 16px;
     }
-    #header h1 { font-size: 16px; font-weight: 600; color: #fff; margin-left: auto; }
+    #header h1 { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: 0.08em; }
+    #conn-status { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    #conn-dot { width: 10px; height: 10px; border-radius: 50%; background: #ff3333; transition: background 0.3s; }
+    #conn-status.connected #conn-dot { background: #2ecc71; }
+    #conn-label { font-size: 13px; color: #888; transition: color 0.3s; }
+    #conn-status.connected #conn-label { color: #2ecc71; }
 
     #incoming-banner {
       display: none;
-      background: #1a0000;
-      border: 1px solid #ff3333;
-      border-radius: 8px;
-      padding: 10px 16px;
+      margin-left: auto;
+      background: rgba(255, 51, 51, 0.08);
+      border: 1px solid #333;
+      border-radius: 999px;
+      padding: 8px 16px;
       align-items: center;
       gap: 12px;
+      font-size: 14px;
+      color: #ccc;
     }
     #incoming-banner.visible { display: flex; }
     #incoming-banner .pulse { width: 10px; height: 10px; border-radius: 50%; background: #ff3333; animation: pulse 1s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     #answer-btn {
-      background: #00cc44;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 20px;
-      font-size: 14px;
+      background: transparent;
+      color: #2ecc71;
+      border: 1px solid #2ecc71;
+      border-radius: 999px;
+      padding: 6px 18px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
+      letter-spacing: 0.06em;
+      transition: background 0.2s, color 0.2s;
     }
+    #answer-btn:hover { background: #2ecc71; color: #000; }
 
     #main-grid {
       flex: 1;
       display: grid;
-      grid-template-columns: 1fr 280px 320px;
-      grid-template-rows: 1fr 200px;
-      gap: 1px;
-      background: #222;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 14px;
+      background: #0a0a0f;
       overflow: hidden;
+      padding: 18px 24px 24px;
     }
 
     .panel {
-      background: #0f0f18;
-      padding: 16px;
+      background: #101015;
+      padding: 18px;
       overflow: hidden;
+      border-radius: 22px;
+      box-shadow: 0 22px 40px rgba(0,0,0,0.6);
     }
-    .panel-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #666; margin-bottom: 12px; }
+    .panel-title { font-size: 18px; font-weight: 650; letter-spacing: 0.12em; text-transform: uppercase; color: #a0a0a0; margin-bottom: 12px; }
 
     /* Video panel */
-    #video-panel { grid-row: 1; position: relative; }
-    #remote-video { width: 100%; height: 100%; object-fit: cover; background: #000; border-radius: 4px; cursor: pointer; transform: scaleX(-1); }
-    #unmute-hint {
-      position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
-      background: rgba(0,0,0,0.7); color: #aaa; font-size: 11px;
-      padding: 4px 10px; border-radius: 4px; pointer-events: none;
+    #video-panel {
+      grid-row: 1 / span 2;
+      grid-column: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
-
+    #remote-video {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      flex: 1;
+      object-fit: cover;
+      background: #000;
+      border-radius: 20px;
+      cursor: pointer;
+      transform: scaleX(-1);
+    }
     /* Vitals panel */
-    #vitals-panel { grid-row: 1; }
-    .vital-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
-    .vital-label { font-size: 12px; color: #888; }
-    .vital-value { font-size: 28px; font-weight: 700; color: #fff; }
-    .vital-unit { font-size: 12px; color: #666; margin-left: 4px; }
+    #vitals-panel { grid-row: 1; grid-column: 2; display: flex; flex-direction: column; overflow-y: auto; min-width: 0; }
+    .vital-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .vital-label { font-size: 16px; color: #dddddd; }
+    .vital-value { font-size: 40px; font-weight: 700; color: #fff; }
+    .vital-unit { font-size: 16px; color: #888; margin-left: 4px; }
     .confidence-bar { height: 4px; background: #222; border-radius: 2px; margin-bottom: 16px; }
     .confidence-fill { height: 100%; border-radius: 2px; background: #00cc44; transition: width 0.5s; }
-    #signal-lost { display: none; color: #ff6600; font-size: 12px; text-align: center; padding: 8px; background: #1a0f00; border-radius: 4px; }
-    #hr-chart-container { height: 100px; }
+    #signal-lost { display: none; color: #ff6600; font-size: 14px; text-align: center; padding: 8px; background: #1a0f00; border-radius: 4px; }
 
     /* Triage panel */
-    #triage-panel { grid-row: 1; }
+    #triage-panel { grid-row: 1; grid-column: 3; display: flex; flex-direction: column; overflow-y: auto; min-width: 0; }
     .severity-bar { display: flex; gap: 4px; margin-bottom: 12px; }
     .severity-dot { flex: 1; height: 8px; border-radius: 2px; background: #222; }
     .severity-dot.active { background: #ff3333; }
     .severity-dot.active.low { background: #00cc44; }
     .severity-dot.active.mid { background: #ffaa00; }
-    .triage-field { margin-bottom: 10px; }
-    .triage-field-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.06em; }
-    .triage-field-value { font-size: 13px; color: #ddd; margin-top: 2px; }
+    .triage-field { margin-bottom: 12px; }
+    .triage-field-label { font-size: 13px; color: #777; text-transform: uppercase; letter-spacing: 0.09em; }
+    .triage-field-value { font-size: 17px; color: #f0f0f0; margin-top: 2px; line-height: 1.4; }
     #critical-alert {
       display: none;
       background: #ff0000;
       color: white;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 16px;
       text-align: center;
       padding: 10px;
       border-radius: 6px;
@@ -111,25 +133,39 @@
     @keyframes flashred { 0%, 100% { background: #ff0000; } 50% { background: #880000; } }
 
     /* Map panel */
-    #map-panel { grid-column: 1 / -1; grid-row: 2; }
-    #map { width: 100%; height: 100%; }
+    #map-panel { grid-row: 2; grid-column: 2 / span 2; display: flex; flex-direction: column; }
+    #map { width: 100%; flex: 1; min-height: 0; border-radius: 18px; overflow: hidden; }
 
-    /* End call */
-    #end-call-btn {
-      position: fixed;
-      bottom: 216px;
-      right: 20px;
-      background: #cc0000;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 24px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
+    /* Video controls bar */
+    #video-controls {
       display: none;
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      gap: 20px;
+      align-items: center;
+      z-index: 10;
     }
-    #end-call-btn.visible { display: block; }
+    #video-controls.visible { display: flex; }
+    .vc-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    .vc-btn:hover { transform: scale(1.1); }
+    .vc-btn:active { transform: scale(0.95); }
+    #mute-btn { background: rgba(255,255,255,0.15); color: #fff; backdrop-filter: blur(8px); }
+    #mute-btn.muted { background: rgba(255,255,255,0.3); }
+    #vc-end-btn { background: #ff4b4b; color: #fff; }
 
     body.critical-state { animation: criticalFlash 1s infinite; }
     @keyframes criticalFlash { 0%, 100% { border: 3px solid transparent; } 50% { border: 3px solid #ff0000; } }
@@ -138,13 +174,14 @@
 <body>
 
 <div id="header">
+  <h1>VISUAL911</h1>
+  <div id="conn-status" title="Disconnected"><div id="conn-dot"></div><span id="conn-label">Disconnected</span></div>
   <div id="incoming-banner">
     <div class="pulse"></div>
     <span>Incoming call</span>
-    <span id="incoming-location" style="color:#888;font-size:12px;"></span>
+    <span id="incoming-location" style="color:#666;font-size:13px;"></span>
     <button id="answer-btn">ANSWER</button>
   </div>
-  <h1>Visual911 — Dispatcher</h1>
 </div>
 
 <div id="critical-alert" style="display:none;margin:8px 20px;border-radius:6px;text-align:center;padding:10px;font-weight:700;background:#ff0000;color:#fff;"></div>
@@ -153,7 +190,17 @@
   <div class="panel" id="video-panel">
     <div class="panel-title">Live Feed</div>
     <video id="remote-video" autoplay playsinline muted></video>
-    <div id="unmute-hint">🔇 Click video to unmute</div>
+    <div id="video-controls">
+      <button class="vc-btn muted" id="mute-btn" title="Toggle audio">
+        <svg id="mute-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+          <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+          <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2c0 .76-.12 1.5-.34 2.18"></path>
+          <line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line>
+        </svg>
+      </button>
+      <button class="vc-btn" id="vc-end-btn" title="End call">✕</button>
+    </div>
   </div>
 
   <div class="panel" id="vitals-panel">
@@ -179,11 +226,7 @@
     </div>
     <div class="confidence-bar"><div class="confidence-fill" id="br-conf" style="width:0%"></div></div>
 
-    <div style="font-size:10px;color:#555;margin-bottom:8px;">From 15s pre-call scan</div>
-
-    <div id="hr-chart-container">
-      <canvas id="hr-chart"></canvas>
-    </div>
+    <div style="font-size:12px;color:#555;margin-bottom:8px;">From pre-call scan</div>
   </div>
 
   <div class="panel" id="triage-panel">
@@ -196,7 +239,7 @@
       <div class="severity-dot" id="sev4"></div>
       <div class="severity-dot" id="sev5"></div>
     </div>
-    <div style="font-size:11px;color:#666;margin-bottom:12px;">Severity: <span id="severity-label">--</span>/5</div>
+    <div style="font-size:12px;color:#666;margin-bottom:10px;">Severity: <span id="severity-label">--</span>/5</div>
 
     <div class="triage-field">
       <div class="triage-field-label">Situation</div>
@@ -221,11 +264,12 @@
   </div>
 
   <div class="panel" id="map-panel">
+    <div class="panel-title">Location</div>
     <div id="map"></div>
   </div>
 </div>
 
-<button id="end-call-btn">END CALL</button>
+
 
 <script>
 // ─── State ────────────────────────────────────────────────────────────────────
@@ -234,39 +278,6 @@ let peerConnection = null;
 let currentCallId = null;
 let map = null;
 let mapMarker = null;
-
-// ─── Chart ───────────────────────────────────────────────────────────────────
-const hrCtx = document.getElementById('hr-chart').getContext('2d');
-const hrLabels = Array(30).fill('');
-const hrData = Array(30).fill(null);
-const hrChart = new Chart(hrCtx, {
-  type: 'line',
-  data: {
-    labels: hrLabels,
-    datasets: [{
-      data: hrData,
-      borderColor: '#ff4444',
-      backgroundColor: 'rgba(255,68,68,0.1)',
-      borderWidth: 2,
-      tension: 0.3,
-      pointRadius: 0,
-      fill: true,
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: { x: { display: false }, y: { min: 40, max: 200, display: false } },
-    plugins: { legend: { display: false } },
-    animation: { duration: 300 },
-  }
-});
-
-function pushHRSample(value) {
-  hrData.shift();
-  hrData.push(value);
-  hrChart.update();
-}
 
 // ─── Map ─────────────────────────────────────────────────────────────────────
 function initMap() {
@@ -322,12 +333,7 @@ function createPeerConnection() {
     if (event.track.kind === 'video') {
       video.onloadedmetadata = () => console.log('Video resolution:', video.videoWidth, 'x', video.videoHeight);
     }
-    // Video starts muted (browser autoplay policy). Click to unmute.
-    video.onclick = () => {
-      video.muted = !video.muted;
-      document.getElementById('unmute-hint').textContent =
-        video.muted ? '🔇 Click video to unmute' : '🔊 Click video to mute';
-    };
+    // Video starts muted (browser autoplay policy). Use mute button to toggle.
   };
 
   peerConnection.oniceconnectionstatechange = () => {
@@ -366,7 +372,14 @@ function connectDashboard() {
   const wsUrl = `${wsProto}://${window.location.host}/ws/dashboard`;
   ws = new WebSocket(wsUrl);
 
-  ws.onopen = () => console.log('Dashboard WS connected');
+  ws.onopen = () => {
+    console.log('Dashboard WS connected');
+    document.getElementById('conn-status').classList.add('connected');
+    document.getElementById('conn-status').title = 'Connected';
+    document.getElementById('conn-label').textContent = 'Connected';
+  };
+  // Uncomment to test local camera feed in the dashboard without WebRTC
+  // startLocalPreview();
 
   ws.onmessage = async (event) => {
     const data = JSON.parse(event.data);
@@ -407,11 +420,25 @@ function connectDashboard() {
 
   ws.onclose = () => {
     console.log('Dashboard WS closed, reconnecting in 2s...');
+    document.getElementById('conn-status').classList.remove('connected');
+    document.getElementById('conn-status').title = 'Disconnected';
+    document.getElementById('conn-label').textContent = 'Disconnected';
     setTimeout(connectDashboard, 2000);
   };
 }
 
 // ─── Event Handlers ───────────────────────────────────────────────────────────
+async function startLocalPreview() {
+  try {
+    const video = document.getElementById('remote-video');
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    video.srcObject = stream;
+    // local camera preview started
+  } catch (e) {
+    console.error('Failed to start local preview', e);
+  }
+}
+
 function onIncomingCall(data) {
   currentCallId = data.call_id;
   const banner = document.getElementById('incoming-banner');
@@ -420,7 +447,7 @@ function onIncomingCall(data) {
   const loc = data.location;
   if (loc?.lat) {
     document.getElementById('incoming-location').textContent =
-      `📍 ${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}`;
+      `${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}`;
     updateMapPin(loc.lat, loc.lng);
   }
 }
@@ -428,7 +455,7 @@ function onIncomingCall(data) {
 document.getElementById('answer-btn').onclick = () => {
   if (!currentCallId || !ws) return;
   document.getElementById('incoming-banner').classList.remove('visible');
-  document.getElementById('end-call-btn').classList.add('visible');
+  document.getElementById('video-controls').classList.add('visible');
 
   ws.send(JSON.stringify({
     type: 'dispatcher_joined',
@@ -436,10 +463,23 @@ document.getElementById('answer-btn').onclick = () => {
   }));
 };
 
-document.getElementById('end-call-btn').onclick = () => {
+document.getElementById('vc-end-btn').onclick = () => {
   if (!ws || !currentCallId) return;
   ws.send(JSON.stringify({ type: 'call_ended', call_id: currentCallId }));
   onCallEnded({ reason: 'dispatcher_ended' });
+};
+
+document.getElementById('mute-btn').onclick = () => {
+  const video = document.getElementById('remote-video');
+  video.muted = !video.muted;
+  const btn = document.getElementById('mute-btn');
+  const icon = document.getElementById('mute-icon');
+  if (video.muted) {
+    icon.innerHTML = '<line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2c0 .76-.12 1.5-.34 2.18"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line>';
+  } else {
+    icon.innerHTML = '<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line>';
+  }
+  btn.classList.toggle('muted', video.muted);
 };
 
 function onVitals(data) {
@@ -447,18 +487,21 @@ function onVitals(data) {
   const brConf = data.breathingConfidence ?? 0;
   const signalLost = document.getElementById('signal-lost');
 
-  // Show warning only if both readings are low-confidence
-  signalLost.style.display = (hrConf < 0.7 && brConf < 0.7) ? 'block' : 'none';
+  // Show warning only when confidence is very low (< 0.4 = essentially no reading)
+  // Presage sends 1.0 (stable) or 0.5 (unstable) — unstable is still usable data
+  signalLost.style.display = (hrConf < 0.4 || brConf < 0.4) ? 'block' : 'none';
 
-  // Update vitals — show any value received
+  // Always show vitals values — dispatchers need to see whatever data we have.
+  // Confidence bar communicates reliability; hiding values helps no one.
   if (data.hr != null) {
     document.getElementById('hr-value').textContent = Math.round(data.hr);
     document.getElementById('hr-conf').style.width = `${Math.round(hrConf * 100)}%`;
-    pushHRSample(data.hr);
+    document.getElementById('hr-conf').style.background = hrConf >= 0.4 ? '#00cc44' : '#ffaa00';
   }
   if (data.breathing != null) {
     document.getElementById('br-value').textContent = Math.round(data.breathing);
     document.getElementById('br-conf').style.width = `${Math.round(brConf * 100)}%`;
+    document.getElementById('br-conf').style.background = brConf >= 0.4 ? '#00cc44' : '#ffaa00';
   }
 }
 
@@ -497,17 +540,50 @@ function onCriticalFlag(data) {
 }
 
 function onCallEnded(data) {
-  document.getElementById('end-call-btn').classList.remove('visible');
+  // Hide call UI
+  document.getElementById('video-controls').classList.remove('visible');
   document.getElementById('incoming-banner').classList.remove('visible');
   document.body.classList.remove('critical-state');
   document.getElementById('critical-alert').style.display = 'none';
+
+  // Tear down WebRTC
   if (peerConnection) {
     peerConnection.close();
     peerConnection = null;
   }
   document.getElementById('remote-video').srcObject = null;
-  currentCallId = null;
+
+  // Reset vitals
+  document.getElementById('hr-value').textContent = '--';
+  document.getElementById('br-value').textContent = '--';
+  document.getElementById('hr-conf').style.width = '0%';
+  document.getElementById('br-conf').style.width = '0%';
+  document.getElementById('signal-lost').style.display = 'none';
+
+  // Reset triage
   document.getElementById('situation').textContent = 'Call ended';
+  document.getElementById('emotional-state').textContent = '--';
+  document.getElementById('response-type').textContent = '--';
+  document.getElementById('can-speak').textContent = '--';
+  document.getElementById('keywords').textContent = '--';
+  document.getElementById('severity-label').textContent = '--';
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById(`sev${i}`).className = 'severity-dot';
+  }
+
+  // Reset mute button
+  const muteBtn = document.getElementById('mute-btn');
+  muteBtn.textContent = '\uD83D\uDD07';
+  muteBtn.classList.add('muted');
+  document.getElementById('remote-video').muted = true;
+
+  // Clear map marker
+  if (mapMarker) {
+    map.removeLayer(mapMarker);
+    mapMarker = null;
+  }
+
+  currentCallId = null;
 }
 
 function playAlert() {
