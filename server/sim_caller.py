@@ -2,6 +2,9 @@
 """Simulate a caller for demo purposes. Sends call_initiated with a location
 near the real device so incident clustering triggers report_count > 1.
 
+Also subscribes to /ws/alerts before initiating the call so alerted_count
+shows ≥1 on the dispatcher dashboard during demos.
+
 Usage:
     python sim_caller.py                         # default: localhost, Chapel Hill coords
     python sim_caller.py --host visual911.mooo.com --lat 35.9132 --lng -79.0558
@@ -16,17 +19,38 @@ import uuid
 import aiohttp
 
 
+async def alerts_subscriber(host: str, port: int, ssl: bool, stop_event: asyncio.Event):
+    """Hold open a /ws/alerts connection so alerted_count increments on broadcast."""
+    scheme = "wss" if ssl else "ws"
+    url = f"{scheme}://{host}:{port}/ws/alerts"
+    ssl_ctx = None if not ssl else True
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.ws_connect(url, ssl=ssl_ctx) as ws:
+                print(f"Subscribed to alerts at {url}")
+                await stop_event.wait()
+    except Exception as e:
+        print(f"Alerts subscriber error: {e}")
+
+
 async def run(host: str, port: int, lat: float, lng: float, duration: int, ssl: bool):
     scheme = "wss" if ssl else "ws"
     call_id = str(uuid.uuid4())
     url = f"{scheme}://{host}:{port}/ws/signal?call_id={call_id}&role=caller"
+    ssl_ctx = None if not ssl else True
 
     print(f"Connecting to {url}")
     print(f"Call ID: {call_id}")
     print(f"Location: ({lat}, {lng})")
 
+    stop_alerts = asyncio.Event()
+    alerts_task = asyncio.create_task(alerts_subscriber(host, port, ssl, stop_alerts))
+
+    # Give the alerts subscription a moment to establish before initiating the call
+    await asyncio.sleep(0.5)
+
     async with aiohttp.ClientSession() as session:
-        async with session.ws_connect(url, ssl=False if not ssl else None) as ws:
+        async with session.ws_connect(url, ssl=ssl_ctx) as ws:
             # Initiate call
             await ws.send_json({
                 "type": "call_initiated",
@@ -48,6 +72,9 @@ async def run(host: str, port: int, lat: float, lng: float, duration: int, ssl: 
             # End call
             await ws.send_json({"type": "call_ended", "call_id": call_id})
             print("call_ended sent")
+
+    stop_alerts.set()
+    await alerts_task
 
 
 def main():
