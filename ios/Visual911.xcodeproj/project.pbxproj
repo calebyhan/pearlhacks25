@@ -13,6 +13,7 @@
 		58FDFC9C9B71D20DA7D32983 /* Visual911App.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_C052B6E9-A4ED-4A9E-9563-B62CBE05E525" /* Visual911App.swift */; };
 		5A9337C32F4ABA69008AAF38 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9337C22F4ABA69008AAF38 /* Secrets.swift */; };
 		5ACE72E32F4ABE0200A56ED4 /* EKGLogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE72E22F4ABE0200A56ED4 /* EKGLogoView.swift */; };
+		5ACE72E62F4B3F7C00A56ED4 /* AlertsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE72E52F4B3F7C00A56ED4 /* AlertsClient.swift */; };
 		635B432EA7F331995A4F2B5D /* TURNCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_943FA7E8-2F3E-4777-8F64-51FA2F5417B4" /* TURNCredentials.swift */; };
 		7176C3A4574567FB84F8E017 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_78D8DA44-70BB-4F87-9814-46D39600C3EF" /* ContentView.swift */; };
 		894BE5AF0C827FEEC44CC8A9 /* PresageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = "TEMP_A1B2DEAF-3A10-47B0-BFE5-5FC8F90945FA" /* PresageManager.swift */; };
@@ -34,6 +35,7 @@
 		4B22ECEBE45369867144032F /* ActiveCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveCallView.swift; sourceTree = "<group>"; };
 		5A9337C22F4ABA69008AAF38 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 		5ACE72E22F4ABE0200A56ED4 /* EKGLogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EKGLogoView.swift; sourceTree = "<group>"; };
+		5ACE72E52F4B3F7C00A56ED4 /* AlertsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsClient.swift; sourceTree = "<group>"; };
 		91E9A66716FB05EB0F78CE63 /* IdleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleView.swift; sourceTree = "<group>"; };
 		B3A1F2CD8E5047AC9D654321 /* InitiatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitiatingView.swift; sourceTree = "<group>"; };
 		C4D5E6F7A8B9C0D1E2F30002 /* RTCLocalVideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTCLocalVideoView.swift; sourceTree = "<group>"; };
@@ -90,6 +92,7 @@
 		97B1065B431B647A206E60F7 = {
 			isa = PBXGroup;
 			children = (
+				5ACE72E52F4B3F7C00A56ED4 /* AlertsClient.swift */,
 				5A9337C22F4ABA69008AAF38 /* Secrets.swift */,
 				A85E9578C264EFF0F8708FF7 /* Views */,
 				108B700DB484DF9EEDEABF52 /* Products */,
@@ -183,6 +186,7 @@
 				9F49FD3CCB6867C45EFC434D /* Config.swift in Sources */,
 				7176C3A4574567FB84F8E017 /* ContentView.swift in Sources */,
 				5ACE72E32F4ABE0200A56ED4 /* EKGLogoView.swift in Sources */,
+				5ACE72E62F4B3F7C00A56ED4 /* AlertsClient.swift in Sources */,
 				C861ADD9F12F0EC629E7D3A4 /* IdleView.swift in Sources */,
 				894BE5AF0C827FEEC44CC8A9 /* PresageManager.swift in Sources */,
 				A7418FFAB74AE1AA5B06346B /* ScanningView.swift in Sources */,

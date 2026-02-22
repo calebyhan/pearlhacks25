@@ -3,6 +3,7 @@ import base64
 import io
 import json
 import logging
+import math
 import os
 import struct
 import time
@@ -35,6 +36,104 @@ active_calls: dict[str, dict] = {}
 # }
 
 dispatcher_connections: set[web.WebSocketResponse] = set()
+
+# ─── Community Alerts / Incident Clustering ───────────────────────────────────
+
+CLUSTER_RADIUS_M = 50  # meters — tuned for hackathon venue (indoor GPS jitter)
+
+incidents: dict[str, dict] = {}
+# Structure per incident_id:
+# {
+#   "call_ids": set[str],
+#   "location": {"lat": float, "lng": float},
+#   "severity_avg": float,
+#   "report_count": int,
+#   "alerted_count": int,
+#   "started_at": float,
+# }
+
+alert_subscribers: set[web.WebSocketResponse] = set()
+
+
+def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Distance in meters between two lat/lng points."""
+    R = 6_371_000  # Earth radius in meters
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+    a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
+    return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+
+def find_or_create_incident(call_id: str, location: dict) -> tuple[str, bool]:
+    """Cluster a call into an existing nearby incident or create a new one."""
+    lat = location.get("lat", 0.0)
+    lng = location.get("lng", 0.0)
+
+    for inc_id, inc in incidents.items():
+        inc_lat = inc["location"].get("lat", 0.0)
+        inc_lng = inc["location"].get("lng", 0.0)
+        if haversine(lat, lng, inc_lat, inc_lng) <= CLUSTER_RADIUS_M:
+            inc["call_ids"].add(call_id)
+            inc["report_count"] = len(inc["call_ids"])
+            return inc_id, False
+
+    inc_id = str(uuid.uuid4())[:8]
+    incidents[inc_id] = {
+        "call_ids": {call_id},
+        "location": location,
+        "severity_avg": 0,
+        "report_count": 1,
+        "alerted_count": 0,
+        "started_at": time.time(),
+    }
+    return inc_id, True
+
+
+async def broadcast_community_alert(incident_id: str):
+    """Push alert to all idle subscribers. Cleans dead connections."""
+    inc = incidents.get(incident_id)
+    if not inc:
+        return
+
+    payload = {
+        "type": "community_alert",
+        "incident_id": incident_id,
+        "location": inc["location"],
+        "severity": inc["severity_avg"],
+        "report_count": inc["report_count"],
+    }
+
+    dead: list[web.WebSocketResponse] = []
+    sent = 0
+    for ws in alert_subscribers.copy():
+        try:
+            if ws.closed:
+                dead.append(ws)
+                continue
+            await ws.send_json(payload)
+            sent += 1
+        except Exception:
+            dead.append(ws)
+    for ws in dead:
+        alert_subscribers.discard(ws)
+
+    inc["alerted_count"] = max(inc["alerted_count"], sent)
+    payload["alerted_count"] = inc["alerted_count"]
+
+    # Also push incident_update to dispatcher dashboards
+    for dash_ws in dispatcher_connections.copy():
+        if not dash_ws.closed:
+            try:
+                await dash_ws.send_json({
+                    "type": "incident_update",
+                    "incident_id": incident_id,
+                    **{k: v for k, v in inc.items() if k != "call_ids"},
+                    "report_count": inc["report_count"],
+                })
+            except Exception:
+                pass
+
 
 # ─── Gemini ───────────────────────────────────────────────────────────────────
 
@@ -251,14 +350,25 @@ async def handle_signal(request: web.Request) -> web.WebSocketResponse:
                 logger.info(f"[{call_id}] Replaying buffered vitals")
                 active_calls[call_id]["last_vitals"] = buffered
 
+            # Cluster into incident
+            location = data.get("location", {})
+            incident_id, is_new = find_or_create_incident(call_id, location)
+            active_calls[call_id]["incident_id"] = incident_id
+            logger.info(f"[{call_id}] Incident {incident_id} (new={is_new}, reports={incidents[incident_id]['report_count']})")
+
             # Notify all connected dispatchers
             for dash_ws in dispatcher_connections.copy():
                 if not dash_ws.closed:
                     await dash_ws.send_json({
                         "type": "incoming_call",
                         "call_id": call_id,
-                        "location": data.get("location", {})
+                        "location": location,
+                        "incident_id": incident_id,
+                        "report_count": incidents[incident_id]["report_count"],
                     })
+
+            # Broadcast community alert to idle subscribers
+            await broadcast_community_alert(incident_id)
 
         elif msg_type == "call_ended":
             await cleanup_call(call_id)
@@ -433,6 +543,24 @@ async def cleanup_call(call_id: str, reason: str = "ended"):
         except asyncio.CancelledError:
             pass
 
+    # Update incident — remove this call, close incident if last call
+    incident_id = call.get("incident_id")
+    if incident_id and incident_id in incidents:
+        inc = incidents[incident_id]
+        inc["call_ids"].discard(call_id)
+        if not inc["call_ids"]:
+            incidents.pop(incident_id)
+            logger.info(f"Incident {incident_id} closed (no remaining calls)")
+            for dash_ws in dispatcher_connections.copy():
+                if not dash_ws.closed:
+                    try:
+                        await dash_ws.send_json({"type": "incident_closed", "incident_id": incident_id})
+                    except Exception:
+                        pass
+        else:
+            inc["report_count"] = len(inc["call_ids"])
+            await broadcast_community_alert(incident_id)
+
     # Notify dashboard
     dashboard_ws = call.get("dashboard_ws")
     if dashboard_ws and not dashboard_ws.closed:
@@ -442,6 +570,37 @@ async def cleanup_call(call_id: str, reason: str = "ended"):
     caller_ws = call.get("caller_ws")
     if caller_ws and not caller_ws.closed:
         await caller_ws.send_json({"type": "call_ended", "call_id": call_id, "reason": reason})
+
+
+# ─── Community Alert Subscriber ───────────────────────────────────────────────
+
+async def handle_alerts(request: web.Request) -> web.WebSocketResponse:
+    ws = web.WebSocketResponse(heartbeat=30)
+    await ws.prepare(request)
+
+    alert_subscribers.add(ws)
+    logger.info(f"Alert subscriber connected (total={len(alert_subscribers)})")
+
+    # Send current active incidents so late joiners see existing state
+    active = []
+    for inc_id, inc in incidents.items():
+        active.append({
+            "incident_id": inc_id,
+            "location": inc["location"],
+            "severity": inc["severity_avg"],
+            "report_count": inc["report_count"],
+            "alerted_count": inc["alerted_count"],
+        })
+    if active:
+        await ws.send_json({"type": "active_incidents", "incidents": active})
+
+    # Keep connection alive — no inbound messages expected
+    async for msg in ws:
+        pass  # ignore any client messages
+
+    alert_subscribers.discard(ws)
+    logger.info(f"Alert subscriber disconnected (total={len(alert_subscribers)})")
+    return ws
 
 
 # ─── App Setup ────────────────────────────────────────────────────────────────
@@ -473,6 +632,7 @@ def create_app() -> web.Application:
     app.router.add_get("/ws/audio", handle_audio)
     app.router.add_get("/ws/vitals", handle_vitals)
     app.router.add_get("/ws/dashboard", handle_dashboard)
+    app.router.add_get("/ws/alerts", handle_alerts)
     app.router.add_get("/api/turn-credentials", handle_turn_credentials)
     app.router.add_get("/", handle_index)
     app.router.add_static("/static", path="./static", name="static")

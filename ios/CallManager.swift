@@ -19,6 +19,8 @@ class CallManager: ObservableObject {
     @Published var isMuted: Bool = false
     /// Real-time scan feedback from Presage (lighting, face position, etc.)
     @Published var scanFeedback: ScanFeedback?
+    /// Community alerts received while idle
+    @Published var nearbyAlerts: [CommunityAlert] = []
 
     private var callId: String?
     private let presage = PresageManager()
@@ -26,6 +28,7 @@ class CallManager: ObservableObject {
     private var audioTap: AudioTap?
     private var signalingClient: SignalingClient?
     private var vitalsClient: VitalsClient?
+    private let alertsClient = AlertsClient()
     private var locationManager = CLLocationManager()
     private var cancellables = Set<AnyCancellable>()
     private var scanTimeoutWork: DispatchWorkItem?
@@ -38,6 +41,13 @@ class CallManager: ObservableObject {
     private let errorCooldown: TimeInterval = 2.0
     /// Fires when the scan finishes (vitals received or timeout). UI can observe this.
     @Published var scanComplete: Bool = false
+
+    init() {
+        alertsClient.onAlertsUpdated = { [weak self] alerts in
+            self?.nearbyAlerts = alerts
+        }
+        alertsClient.connect()
+    }
 
     func onSOSPressed() {
         guard state == .idle else { return }
@@ -173,6 +183,9 @@ class CallManager: ObservableObject {
         lastLocation = location
         transition(to: .initiating)
 
+        // Stop listening for community alerts during a call
+        alertsClient.disconnect()
+
         signalingClient = SignalingClient(callId: callId, delegate: self)
         vitalsClient = VitalsClient(callId: callId)
         audioTap = AudioTap(callId: callId)
@@ -254,10 +267,15 @@ class CallManager: ObservableObject {
         isMuted = false
         scanComplete = false
         scanFeedback = nil
+        nearbyAlerts = []
         state = .idle
+
+        // Re-subscribe to community alerts
+        alertsClient.connect()
     }
 
     private func currentLocation() -> CLLocationCoordinate2D? {
+        if let demo = Config.demoLocationOverride { return demo }
         locationManager.requestWhenInUseAuthorization()
         let loc = locationManager.location
         guard let loc, loc.horizontalAccuracy >= 0 else { return nil }

@@ -2,30 +2,24 @@
 
 ## System Overview
 
-Visual911 has three main components: an iOS caller app, a Python backend on Vultr, and a browser-based dispatcher dashboard. The iOS app never communicates directly with the dispatcher dashboard except for the P2P WebRTC video/audio stream — all other data (vitals, AI triage, call events) routes through the Vultr server.
+Visual911 has four main components: an iOS caller app, an iOS idle community app, a Python backend on Vultr, and a browser-based dispatcher dashboard. The iOS caller app never communicates directly with the dispatcher dashboard except for the P2P WebRTC video/audio stream — all other data routes through the Vultr server.
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         iOS Caller App                           │
-│                                                                   │
-│  Presage SDK ──► vitals JSON ──────────────────────────────────► │
-│  AVAudioEngine ──► PCM audio + JPEG frames ────────────────────► │
-│  WebRTC ◄──────────────────────────────── signaling ───────────► │ Vultr Server
-│  CLLocationManager ──► GPS coords ─────────────────────────────► │
-│                                                                   │
-│  WebRTC video/audio ◄──────────────────────────P2P──────────────►│ Dispatcher
-└─────────────────────────────────────────────────────────────────┘    Browser
-                              │
-                    ┌─────────▼─────────┐
-                    │   Vultr Server     │
-                    │   (server.py)      │
-                    │                    │
-                    │  /ws/signal        │──► forwards SDP/ICE
-                    │  /ws/audio    ─────┼──► Gemini (batch)
-                    │  /ws/vitals        │
-                    │  /ws/dashboard ────┼──► Dispatcher Browser
-                    │  /api/turn-creds   │──► TURN credentials
-                    └────────────────────┘
+┌──────────────────────────────┐        WebRTC P2P        ┌──────────────────┐
+│      iOS Caller App          │◄───── video/audio ───────►│  Dispatcher      │
+│                              │                           │  Browser         │
+│  Presage SDK ──► vitals ─────┼──► /ws/vitals            └────────┬─────────┘
+│  AVAudioEngine ──► PCM ──────┼──► /ws/audio ──► Gemini          │ /ws/dashboard
+│  CLLocationManager ──► GPS ──┼──► /ws/signal                     │
+│  WebRTC signaling ───────────┼──► /ws/signal            ┌────────▼─────────┐
+└──────────────────────────────┘                          │   Vultr Server    │
+                                                           │   (server.py)     │
+┌──────────────────────────────┐                          │                   │
+│   iOS Idle App (community)   │◄── /ws/alerts broadcast ─┤  Incident         │
+│                              │                           │  clustering +     │
+│  AlertsClient ───────────────┼──► /ws/alerts subscribe  │  community        │
+│  IdleView alert banner       │                           │  broadcast        │
+└──────────────────────────────┘                          └───────────────────┘
 ```
 
 ---
@@ -48,16 +42,19 @@ The caller-facing application. Manages the full call lifecycle and coordinates t
 
 A single `server.py` process handles all backend logic. Uses `aiohttp` for WebSocket serving, `python-dotenv` for environment config, and asyncio tasks for concurrent call management.
 
-Four WebSocket endpoints:
+Five WebSocket endpoints:
 - `/ws/signal` — forwards WebRTC SDP offers, answers, and ICE candidates between caller and dispatcher
 - `/ws/audio` — receives PCM audio and JPEG frames from iOS, buffers them for Gemini batch analysis
 - `/ws/vitals` — receives vitals JSON from iOS, forwards to the connected dispatcher dashboard; buffers vitals that arrive before `call_initiated` registers the call
-- `/ws/dashboard` — browser-facing endpoint; pushes incoming call notifications, triage updates, vitals, and call events; replays cached vitals on dispatcher join
+- `/ws/dashboard` — browser-facing endpoint; pushes incoming call notifications, triage updates, vitals, call events, and incident clustering metrics; replays cached vitals on dispatcher join
+- `/ws/alerts` — persistent subscriber channel for idle iOS devices; receives `community_alert` broadcasts when a nearby incident is created or updated
 
 One REST endpoint:
 - `/api/turn-credentials` — generates time-limited HMAC TURN credentials for WebRTC NAT traversal
 
 One asyncio task per active call runs **batch Gemini analysis**: every 10 seconds, it drains the audio queue, wraps accumulated PCM in a WAV container, and calls `gemini-2.5-flash` via `generateContent` (not the Live API). Previous analysis summary is carried forward as context for continuity.
+
+**Incident clustering**: on `call_initiated`, the server computes haversine distance to all active incidents. Calls within 50m of an existing incident are grouped together (`report_count` increments). A new incident is created if no match is found. Incidents are destroyed when all their linked calls end.
 
 A separate `coturn` process (port 3478/5349) provides STUN/TURN for WebRTC NAT traversal.
 
@@ -65,11 +62,13 @@ A separate `coturn` process (port 3478/5349) provides STUN/TURN for WebRTC NAT t
 
 A single `index.html` served at `/` on Vultr. Uses the browser WebRTC API for the P2P video connection and a WebSocket to `/ws/dashboard` for all other data. No framework — plain HTML, CSS, and JavaScript.
 
+**Community metrics bar** (below header): "Active Incidents · Total Reports · Users Alerted" — updated on every `incident_update` message with a flash animation when numbers change.
+
 Three-column, two-row grid layout:
 - **Video** (left, full height) — `<video>` element fed by the WebRTC P2P stream, mirrored, with overlay mute/end controls
 - **Vitals** (top center) — HR and breathing rate with confidence bars; labeled "From pre-call scan"
 - **AI Triage** (top right) — situation summary, severity level (1–5), emotional state, recommended response type, keywords
-- **Location** (bottom, spans center + right) — Leaflet.js map with GPS pin
+- **Location** (bottom, spans center + right) — Leaflet.js map with GPS pin for active caller + DivIcon badges for each incident (showing report count, color-coded by severity)
 
 TURN credentials are fetched dynamically from `/api/turn-credentials` on page load. Connection status indicator in the header shows WebSocket state.
 
@@ -96,7 +95,10 @@ TURN credentials are fetched dynamically from `/api/turn-credentials` on page lo
 7. Server:
    - Stores call state (including audio_queue)
    - Replays any vitals buffered before call registration
-   - Notifies all connected dispatcher dashboards: { type: "incoming_call", call_id, location }
+   - Clusters call into incident via haversine (50m radius)
+   - Notifies all connected dispatcher dashboards: { type: "incoming_call", call_id, location, incident_id, report_count }
+   - Broadcasts { type: "community_alert" } to all /ws/alerts subscribers
+   - Pushes { type: "incident_update" } to all dispatcher dashboards
 
 8. Dispatcher clicks Answer → sends { type: "dispatcher_joined", call_id }
 
@@ -135,6 +137,9 @@ iOS RTCCameraVideoCapturer → WebRTC → dispatcher <video> element
 Either party sends { type: "call_ended", call_id }
 Server:
   - Sends sentinel to audio_queue, cancels Gemini task
+  - Removes call_id from its incident's call_ids set
+  - If incident has no remaining calls: deletes incident, sends { type: "incident_closed" } to dashboards
+  - If incident has remaining calls: sends updated incident_update to dashboards
   - Notifies other party
   - Removes call from active_calls dict
 iOS:
@@ -207,3 +212,12 @@ DataChannel is P2P — the server never sees it. Routing through `/ws/vitals` le
 
 **Why dynamic TURN credentials via `/api/turn-credentials`?**
 coturn uses time-limited HMAC credentials. The server generates them on demand so both the iOS app and dashboard can fetch fresh credentials without hardcoding secrets in client code.
+
+**Why 50m clustering radius instead of 500m?**
+Indoor GPS on iOS has ~10–30m accuracy under good conditions, but can jitter by 50–100m in buildings. 500m would cluster unrelated incidents at any urban hackathon venue. 50m is tight enough to differentiate incidents while still clustering two phones standing next to each other. `CLUSTER_RADIUS_M` is a configurable constant in `server.py`.
+
+**Why haversine instead of a geospatial database?**
+For a demo with ≤10 active incidents, iterating all incidents is O(n) with negligible cost. No Redis, PostGIS, or geohash library needed — just stdlib `math`.
+
+**Why disconnect AlertsClient during an active call?**
+The caller is already in an active call — they don't need community alerts while talking to a dispatcher. More importantly, it avoids wasting a WebSocket connection and ensures the caller's bandwidth is reserved for WebRTC.

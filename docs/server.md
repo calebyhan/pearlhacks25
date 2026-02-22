@@ -2,7 +2,7 @@
 
 ## Overview
 
-A single Python asyncio process (`server.py`) handles all backend logic: WebRTC signaling, Gemini batch analysis, vitals relay, TURN credential generation, and static file serving for the dispatcher dashboard. No separate Node.js process, no IPC.
+A single Python asyncio process (`server.py`) handles all backend logic: WebRTC signaling, Gemini batch analysis, vitals relay, incident clustering, community alert broadcast, TURN credential generation, and static file serving for the dispatcher dashboard. No separate Node.js process, no IPC.
 
 Uses `aiohttp` for WebSocket serving, `python-dotenv` for environment config. One asyncio `Task` per active call manages periodic Gemini analysis using the batch `generateContent` API (not the Live API).
 
@@ -66,11 +66,28 @@ active_calls: dict[str, dict] = {}
 #   "audio_queue": asyncio.Queue,
 #   "gemini_task": Optional[asyncio.Task],
 #   "location": {"lat": float, "lng": float},
+#   "incident_id": str,           # ← new: which incident this call belongs to
 #   "started_at": float,
 #   "last_vitals": Optional[dict],
 # }
 
 dispatcher_connections: set[web.WebSocketResponse] = set()
+
+# Community alert state
+CLUSTER_RADIUS_M = 50  # meters — tuned for hackathon venue indoor GPS accuracy
+
+incidents: dict[str, dict] = {}
+# Structure per incident_id:
+# {
+#   "call_ids": set[str],
+#   "location": {"lat": float, "lng": float},
+#   "severity_avg": float,
+#   "report_count": int,
+#   "alerted_count": int,
+#   "started_at": float,
+# }
+
+alert_subscribers: set[web.WebSocketResponse] = set()
 
 # Buffer vitals that arrive before call_initiated registers the call
 pending_vitals: dict[str, dict] = {}
@@ -173,7 +190,7 @@ async def handle_signal(request):
 ```
 
 Handles call lifecycle and WebRTC SDP/ICE forwarding:
-- `call_initiated`: Creates the call entry in `active_calls` with audio_queue, notifies all connected dispatchers via `incoming_call`. Checks `pending_vitals` buffer and replays any early vitals.
+- `call_initiated`: Creates the call entry in `active_calls` with audio_queue. Clusters into an incident via `find_or_create_incident()` (haversine, 50m radius). Notifies all connected dispatchers via `incoming_call` (includes `incident_id` and `report_count`). Broadcasts `community_alert` to all `alert_subscribers`. Checks `pending_vitals` buffer and replays any early vitals.
 - `call_ended`: Triggers `cleanup_call()`.
 - Other messages (SDP offers/answers, ICE candidates): forwarded to the opposing party (caller↔dispatcher).
 - On WebSocket close: if caller disconnects, triggers cleanup.
@@ -249,9 +266,11 @@ async def cleanup_call(call_id: str, reason: str = "ended"):
 
 1. Pops call from `active_calls`
 2. Cancels Gemini task (sends sentinel to queue, then `task.cancel()`)
-3. Notifies dashboard with `call_ended`
-4. Notifies caller with `call_ended`
-5. Cleans up `pending_vitals` for the call_id
+3. Removes `call_id` from `incidents[incident_id]["call_ids"]`
+   - If no calls remain: deletes incident, sends `incident_closed` to all dashboards
+   - If calls remain: sends updated `incident_update` to dashboards
+4. Notifies dashboard with `call_ended`
+5. Notifies caller with `call_ended`
 
 ### App Setup
 
@@ -277,7 +296,8 @@ Routes summary:
 | `/ws/signal` | WS | Signaling + call lifecycle |
 | `/ws/audio` | WS | Audio PCM + JPEG frames |
 | `/ws/vitals` | WS | Vitals relay |
-| `/ws/dashboard` | WS | Dispatcher communication |
+| `/ws/dashboard` | WS | Dispatcher communication + incident metrics |
+| `/ws/alerts` | WS | Community alert broadcast (idle iOS subscribers) |
 
 ```python
 if __name__ == "__main__":
@@ -404,6 +424,10 @@ See `CLAUDE.md` for the full message schema. Quick reference:
 
 **Server → iOS:** `dispatcher_ready`, `call_ended`, WebRTC SDP/ICE
 
-**Server → Dashboard (/ws/dashboard):** `incoming_call`, `triage_update`, `vitals`, `call_ended`
+**Server → Dashboard (/ws/dashboard):** `incoming_call`, `triage_update`, `vitals`, `call_ended`, `incident_update`, `incident_closed`
 
 **Dashboard → Server (/ws/dashboard):** `dispatcher_joined`, `call_ended`, WebRTC SDP/ICE
+
+**Server → /ws/alerts subscribers:** `community_alert`, `active_incidents`
+
+**sim_caller.py** — demo script that simulates a second caller for incident clustering. Usage: `python sim_caller.py --host visual911.mooo.com --ssl --lat <lat> --lng <lng>`

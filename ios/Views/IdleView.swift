@@ -40,6 +40,45 @@ struct IdleView: View {
                 .padding(.horizontal, 29)
                 .padding(.top, 24)
 
+                // MARK: Community Alerts Banner
+                if !callManager.nearbyAlerts.isEmpty {
+                    let totalReports = callManager.nearbyAlerts.reduce(0) { $0 + $1.reportCount }
+                    let maxSeverity = callManager.nearbyAlerts.map(\.severity).max() ?? 0
+
+                    VStack(spacing: 6) {
+                        HStack(spacing: 8) {
+                            Circle()
+                                .fill(maxSeverity >= 4 ? Color.red : Color.orange)
+                                .frame(width: 10, height: 10)
+                                .overlay(
+                                    Circle()
+                                        .stroke(maxSeverity >= 4 ? Color.red : Color.orange, lineWidth: 2)
+                                        .scaleEffect(1.6)
+                                        .opacity(0.4)
+                                )
+                            Text("\(callManager.nearbyAlerts.count) incident\(callManager.nearbyAlerts.count == 1 ? "" : "s") nearby")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(.white)
+                            Spacer()
+                            Text("\(totalReports) report\(totalReports == 1 ? "" : "s")")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.red.opacity(0.15))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.red.opacity(0.3), lineWidth: 1)
+                            )
+                    )
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
+                }
+
                 Spacer()
 
                 // MARK: SOS Section

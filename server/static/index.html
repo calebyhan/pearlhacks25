@@ -169,6 +169,40 @@
 
     body.critical-state { animation: criticalFlash 1s infinite; }
     @keyframes criticalFlash { 0%, 100% { border: 3px solid transparent; } 50% { border: 3px solid #ff0000; } }
+
+    /* Community metrics bar */
+    #community-metrics {
+      display: flex;
+      gap: 20px;
+      padding: 6px 20px;
+      background: #0d0d14;
+      border-bottom: 1px solid #1a1a22;
+      font-size: 13px;
+      color: #888;
+    }
+    .cm-stat { display: flex; align-items: center; gap: 6px; }
+    .cm-stat .cm-val { font-weight: 700; color: #e0e0e0; font-size: 15px; transition: color 0.3s; }
+    .cm-stat.hot .cm-val { color: #ff6644; }
+    @keyframes metricFlash { 0% { color: #fff; } 60% { color: #ff6644; } 100% { color: #ff6644; } }
+    .cm-val.flash { animation: metricFlash 0.5s ease-out forwards; }
+
+    /* Incident marker badges on map */
+    .incident-badge {
+      background: #ff3333;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(255,51,51,0.5);
+      border: 2px solid #fff;
+    }
+    .incident-badge.sev-low { background: #00cc44; }
+    .incident-badge.sev-mid { background: #ffaa00; color: #000; }
   </style>
 </head>
 <body>
@@ -182,6 +216,12 @@
     <span id="incoming-location" style="color:#666;font-size:13px;"></span>
     <button id="answer-btn">ANSWER</button>
   </div>
+</div>
+
+<div id="community-metrics">
+  <div class="cm-stat" id="cm-incidents">Active Incidents: <span class="cm-val">0</span></div>
+  <div class="cm-stat" id="cm-reports">Total Reports: <span class="cm-val">0</span></div>
+  <div class="cm-stat" id="cm-alerted">Users Alerted: <span class="cm-val">0</span></div>
 </div>
 
 <div id="critical-alert" style="display:none;margin:8px 20px;border-radius:6px;text-align:center;padding:10px;font-weight:700;background:#ff0000;color:#fff;"></div>
@@ -278,6 +318,10 @@ let peerConnection = null;
 let currentCallId = null;
 let map = null;
 let mapMarker = null;
+
+// Community alert state
+const incidentData = {};      // {incident_id: {location, report_count, alerted_count, severity}}
+const incidentMarkers = {};   // {incident_id: L.marker}
 
 // ─── Map ─────────────────────────────────────────────────────────────────────
 function initMap() {
@@ -431,6 +475,15 @@ function connectDashboard() {
             sdpMLineIndex: data.sdpMLineIndex
           });
         }
+        break;
+      case 'incident_update':
+        onIncidentUpdate(data);
+        break;
+      case 'incident_closed':
+        onIncidentClosed(data);
+        break;
+      case 'active_incidents':
+        onActiveIncidents(data);
         break;
     }
   };
@@ -616,6 +669,86 @@ function playAlert() {
     osc.start();
     osc.stop(ctx.currentTime + 0.5);
   } catch (e) {}
+}
+
+// ─── Incident Tracking ───────────────────────────────────────────────────────
+function flashVal(el, newVal) {
+  const prev = el.textContent;
+  el.textContent = newVal;
+  if (String(prev) !== String(newVal)) {
+    el.classList.remove('flash');
+    void el.offsetWidth; // force reflow to restart animation
+    el.classList.add('flash');
+  }
+}
+
+function updateCommunityMetrics() {
+  const ids = Object.keys(incidentData);
+  let totalReports = 0, totalAlerted = 0;
+  for (const inc of Object.values(incidentData)) {
+    totalReports += inc.report_count || 0;
+    totalAlerted += inc.alerted_count || 0;
+  }
+  flashVal(document.querySelector('#cm-incidents .cm-val'), ids.length);
+  flashVal(document.querySelector('#cm-reports .cm-val'), totalReports);
+  flashVal(document.querySelector('#cm-alerted .cm-val'), totalAlerted);
+
+  document.getElementById('cm-incidents').classList.toggle('hot', ids.length > 0);
+}
+
+function upsertIncidentMarker(incidentId, inc) {
+  if (!map) initMap();
+  const lat = inc.location?.lat;
+  const lng = inc.location?.lng;
+  if (!lat || !lng) return;
+
+  const sevClass = (inc.severity_avg || 0) <= 2 ? 'sev-low' : (inc.severity_avg || 0) <= 3 ? 'sev-mid' : '';
+  const icon = L.divIcon({
+    className: '',
+    html: `<div class="incident-badge ${sevClass}">${inc.report_count || 1}</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+  });
+
+  if (incidentMarkers[incidentId]) {
+    incidentMarkers[incidentId].setIcon(icon);
+    incidentMarkers[incidentId].setLatLng([lat, lng]);
+  } else {
+    incidentMarkers[incidentId] = L.marker([lat, lng], { icon })
+      .addTo(map)
+      .bindPopup(`Incident: ${inc.report_count} report(s)`);
+  }
+  incidentMarkers[incidentId].setPopupContent(`Incident: ${inc.report_count} report(s) · ${inc.alerted_count || 0} alerted`);
+}
+
+function onIncidentUpdate(data) {
+  const id = data.incident_id;
+  incidentData[id] = {
+    location: data.location,
+    report_count: data.report_count,
+    alerted_count: data.alerted_count || 0,
+    severity_avg: data.severity_avg || 0,
+  };
+  upsertIncidentMarker(id, incidentData[id]);
+  updateCommunityMetrics();
+}
+
+function onIncidentClosed(data) {
+  const id = data.incident_id;
+  delete incidentData[id];
+  if (incidentMarkers[id]) {
+    map.removeLayer(incidentMarkers[id]);
+    delete incidentMarkers[id];
+  }
+  updateCommunityMetrics();
+}
+
+function onActiveIncidents(data) {
+  for (const inc of (data.incidents || [])) {
+    incidentData[inc.incident_id] = inc;
+    upsertIncidentMarker(inc.incident_id, inc);
+  }
+  updateCommunityMetrics();
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
