@@ -16,6 +16,8 @@ Target duration: 3 minutes. Never go longer than 10 minutes (Gemini API budget).
 | Teammate B | Dispatcher | Laptop browser (visual911.mooo.com) |
 | Teammate C | Presents / narrates + runs sim_caller.py | Laptop terminal |
 
+> **One-device constraint**: Only one iPhone is used for the live demo. The community alert iOS UI (alert banner on idle phones) is described verbally and shown via the dashboard metrics bar — not demonstrated on a second physical device.
+
 ---
 
 ## Pre-Demo Setup (15 minutes before)
@@ -23,8 +25,7 @@ Target duration: 3 minutes. Never go longer than 10 minutes (Gemini API budget).
 ### Environment
 - [ ] Room has ≥60 lux lighting on Teammate A's face (overhead lights on, face visible)
 - [ ] Teammate A's phone propped 1–2ft from face, front camera pointing at face
-- [ ] Both devices on the same WiFi (preferred) or Teammate A on LTE
-- [ ] **Third phone (Device C) also on same WiFi, app open in idle state** — this is the "community member" device
+- [ ] iPhone and laptop on the same WiFi (preferred) or iPhone on LTE
 - [ ] Laptop browser has visual911.mooo.com open and dispatcher dashboard loaded
 - [ ] Dashboard connected (green dot in header)
 - [ ] Terminal open with: `cd server && python sim_caller.py --host visual911.mooo.com --ssl --lat <venue_lat> --lng <venue_lng> --duration 60`  — **DO NOT RUN YET**, just have it ready
@@ -32,7 +33,6 @@ Target duration: 3 minutes. Never go longer than 10 minutes (Gemini API budget).
 ### Devices
 - [ ] iPhone charged, screen timeout disabled (Settings → Display → Never)
 - [ ] Visual911 app installed and launched — verify idle screen shows, no crashes
-- [ ] Device C (community member phone) app open on idle screen — verify no crash
 - [ ] Presage API key confirmed working (check last test run logs)
 - [ ] coturn running on Vultr: `systemctl status coturn`
 - [ ] Server running on Vultr: `systemctl status visual911`
@@ -59,11 +59,11 @@ Have Teammate A do 30 seconds of jumping jacks right before the demo. Natural HR
 
 ---
 
-### Step 1: Community member is already subscribed (0:00)
+### Step 1: Community members are already subscribed (0:00)
 
-Point to Device C (the idle iPhone).
+Point to the dashboard metrics bar (zeros at this point).
 
-> "This phone represents anyone in the community running Visual911. Right now it's idle — but it's connected to our alert network in the background. If something happens nearby, it'll know."
+> "Visual911 has two types of users: callers and community members. Any phone with the app installed — even if it's idle — subscribes to nearby incident alerts in the background. Right now the metrics bar shows zero active incidents. The moment someone presses SOS, that changes."
 
 Dashboard community metrics bar shows: **Active Incidents: 0 · Total Reports: 0 · Users Alerted: 0**
 
@@ -79,12 +79,12 @@ Teammate A taps the SOS button.
 
 ### Step 3: Community alert fires (0:12)
 
-**Device C banner appears**: "1 incident nearby · 1 report"
-
-Dashboard metrics update (flash animation): **Active Incidents: 1 · Total Reports: 1 · Users Alerted: 1**
+Dashboard metrics update (flash animation): **Active Incidents: 1 · Total Reports: 1 · Users Alerted: N**
 Map pin appears on the Leaflet map with a badge showing "1".
 
-> "The moment SOS is pressed, every Visual911 user nearby gets an alert. Our platform has broadcast this incident to the community — in real time, before a dispatcher has even answered."
+> "The moment SOS is pressed, our server clusters this into an incident and broadcasts to every nearby Visual911 subscriber. On any idle phone in the area, a banner appears: '1 incident nearby · 1 report.' The dashboard just flashed — Active Incidents went from 0 to 1, before any dispatcher has even answered."
+
+*(The alert banner UI is built in the iOS app — on a second device it would show live. Here, the dispatcher dashboard metrics tell the same story.)*
 
 ---
 
@@ -94,10 +94,9 @@ Teammate C runs the prepared `sim_caller.py` command.
 
 > "Now watch what happens when a second person nearby reports the same incident."
 
-**Device C banner updates**: "1 incident nearby · 2 reports"
-Dashboard map badge updates from "1" → "2". Metrics: **Total Reports: 2 · Users Alerted: 1**
+Dashboard map badge updates from "1" → "2". Metrics: **Total Reports: 2 · Users Alerted: N**
 
-> "The system automatically cross-references submissions by GPS location. Two reports, same incident. The dispatcher can see this corroboration instantly — higher confidence, higher priority."
+> "The system automatically cross-references submissions by GPS location — haversine distance, 50-meter radius. Two reports, same incident. Every subscriber's phone banner updates: '1 incident nearby · 2 reports.' The dispatcher sees the badge increment in real time — higher report count means higher confidence, higher priority dispatch."
 
 ---
 
@@ -155,9 +154,9 @@ Point to the map showing both the caller pin and the incident badge.
 
 Teammate B clicks END CALL. When both calls end, the incident closes.
 
-Dashboard metrics reset. Device C banner disappears.
+Dashboard metrics reset.
 
-> "When the incident resolves, the alert clears. The community knows it's over."
+> "When the incident resolves, every subscriber gets a cleared alert. The community knows it's over."
 
 ---
 
@@ -195,11 +194,10 @@ Estimated capacity: ~40 demo/test sessions. Confirm balance at physiology.presag
 
 ## What to Do If Things Break
 
-**Community alert not appearing on Device C:**
-- Verify Device C is on the same WiFi as the server
-- Check server logs for `Alert subscriber connected` — if missing, the `/ws/alerts` WebSocket didn't connect
-- Restart the app on Device C — AlertsClient reconnects with 3s backoff
-- Fallback: narrate the feature without Device C, point to dashboard metrics bar
+**Community alert metrics not updating on dashboard:**
+- Check server logs for `/ws/alerts` messages — if none, the broadcast path has an issue
+- The `alerted_count` in the metrics only increments if subscribers are connected; at demo time there may be 0 subscribers (that's fine — narrate what the subscriber experience looks like)
+- Metrics bar should still update on `incident_update` messages regardless of subscriber count
 
 **sim_caller.py not clustering with real call:**
 - Check that `--lat` and `--lng` match `Config.demoLocationOverride` to within 50m
@@ -251,5 +249,5 @@ Estimated capacity: ~40 demo/test sessions. Confirm balance at physiology.presag
 **Track alignment:**
 - Broadcasting alerts ✓ — `/ws/alerts` broadcast to all idle subscribers
 - Cross-check submissions ✓ — GPS clustering groups corroborating reports per incident
-- # users alerted per situation ✓ — `alerted_count` tracked per incident, shown on dashboard
-- # alerts raised per event ✓ — `report_count` per incident, shown as badge on map pin
+- \# users alerted per situation ✓ — `alerted_count` tracked per incident, shown on dashboard
+- \# alerts raised per event ✓ — `report_count` per incident, shown as badge on map pin

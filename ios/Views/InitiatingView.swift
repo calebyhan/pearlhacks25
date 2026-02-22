@@ -13,7 +13,7 @@ struct InitiatingView: View {
 
                 // MARK: Header
                 HStack {
-                    Text("VISUAL 911")
+                    Text("VISUAL911")
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundColor(.white)
                     Spacer()
