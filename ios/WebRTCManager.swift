@@ -32,6 +32,11 @@ class WebRTCManager: NSObject {
         config.iceServers = [
             RTCIceServer(urlStrings: ["stun:stun.l.google.com:19302"]),
             RTCIceServer(urlStrings: ["stun:stun1.l.google.com:19302"]),
+            RTCIceServer(
+                urlStrings: ["turn:visual911.mooo.com:3478", "turns:visual911.mooo.com:5349"],
+                username: generatedTURNUsername(),
+                credential: generatedTURNCredential()
+            ),
         ]
         config.sdpSemantics = .unifiedPlan
         config.continualGatheringPolicy = .gatherContinually

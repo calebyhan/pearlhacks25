@@ -12,9 +12,9 @@ func generateTURNCredentials(secret: String) -> (username: String, credential: S
 
 // Convenience accessors used by WebRTCManager
 func generatedTURNUsername() -> String {
-    generateTURNCredentials(secret: "YOUR_COTURN_SECRET").username
+    generateTURNCredentials(secret: "db2669070d85d65b473452eeec7c2522576b3e03cd77efc169b5e52a99270df0").username
 }
 
 func generatedTURNCredential() -> String {
-    generateTURNCredentials(secret: "YOUR_COTURN_SECRET").credential
+    generateTURNCredentials(secret: "db2669070d85d65b473452eeec7c2522576b3e03cd77efc169b5e52a99270df0").credential
 }

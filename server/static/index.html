@@ -299,10 +299,27 @@ function updateMapPin(lat, lng) {
 }
 
 // ─── WebRTC ───────────────────────────────────────────────────────────────────
-const iceServers = [
+let iceServers = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
 ];
+
+// Fetch TURN credentials from server
+async function loadTURNCredentials() {
+  try {
+    const resp = await fetch('/api/turn-credentials');
+    const data = await resp.json();
+    iceServers.push({
+      urls: data.urls,
+      username: data.username,
+      credential: data.credential,
+    });
+    console.log('TURN credentials loaded');
+  } catch (e) {
+    console.warn('Could not load TURN credentials:', e);
+  }
+}
+loadTURNCredentials();
 
 function createPeerConnection() {
   peerConnection = new RTCPeerConnection({ iceServers });

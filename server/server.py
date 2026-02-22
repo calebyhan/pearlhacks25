@@ -450,12 +450,30 @@ async def handle_index(request: web.Request) -> web.FileResponse:
     return web.FileResponse("./static/index.html")
 
 
+TURN_SECRET = os.environ.get("TURN_SECRET", "")
+
+async def handle_turn_credentials(request: web.Request) -> web.Response:
+    """Generate time-limited TURN credentials using coturn's shared secret."""
+    import hashlib
+    import hmac
+    expiry = int(time.time()) + 86400  # 24 hours
+    username = f"{expiry}:visual911"
+    mac = hmac.new(TURN_SECRET.encode(), username.encode(), hashlib.sha1).digest()
+    credential = base64.b64encode(mac).decode()
+    return web.json_response({
+        "username": username,
+        "credential": credential,
+        "urls": ["turn:visual911.mooo.com:3478", "turns:visual911.mooo.com:5349"],
+    })
+
+
 def create_app() -> web.Application:
     app = web.Application()
     app.router.add_get("/ws/signal", handle_signal)
     app.router.add_get("/ws/audio", handle_audio)
     app.router.add_get("/ws/vitals", handle_vitals)
     app.router.add_get("/ws/dashboard", handle_dashboard)
+    app.router.add_get("/api/turn-credentials", handle_turn_credentials)
     app.router.add_get("/", handle_index)
     app.router.add_static("/static", path="./static", name="static")
     return app

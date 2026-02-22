@@ -1,6 +1,6 @@
 enum Config {
     static let presageApiKey = Secrets.presageApiKey
-    static let serverHost    = "wss://postlike-clarissa-muddiest.ngrok-free.dev"
+    static let serverHost    = "wss://visual911.mooo.com"
 
     // WebSocket endpoints
     static let signalURL  = "\(serverHost)/ws/signal"
